@@ -66,25 +66,21 @@ public class PensionistaController {
                 + "join siaporgao so on so.c_ua = c.codigo_ua and so.cnpj = replace(replace(replace(c.cnpj_ua, '/', ''), '-', ''), '.', '') "
                 + "where s.idservidor between '" + idServidorI + "' AND '"
                 + idServidorF + "' and m.ano = '" + MGSiap.getOpcoes().getAno()
-                + "' and m.mes = '" + MGSiap.getOpcoes().getMes()
-                + "' and m.parcela = '000' "
+                + "' and m.mes = '" + MGSiap.getOpcoes().getMes() + "' "
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                // + "and s.idvinculo != '11' " // Alterado no leiaute 1ª edição - Exercício 2024
-                + "and s.idvinculo not in('11') "
-                + "and so.cardug = '" + MGSiap.getOpcoes().getCodigoOrgao().substring(0, 6)
-                + "' /*and (select sum(ff.n_valor) from financeiro ff where ff.idservidor = sp.idservidor and ff.ano = m.ano and ff.mes = m.mes "
-                + "and ff.parcela = m.parcela and ff.idevento in ('001','002','003') and ff.n_valor > 0 group by ff.idservidor) > 0*/ "
+                + "and S.IDVINCULO in ('4', '5') "
+                + "and so.cardug = '" + MGSiap.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "and md.retorna = 'Desligamento' and f.tipo = 'C'"
                 + "group by " + select.replace(" CPFPensionista", "").replace(" MatPensionista", "")
                 + " order by s.servidor";
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, true);
         return tabelaRecebe;
     }
 
     public void toXmlFile(ResultSet resultSet) {
-        MGSiap.toLogs("Executando o Leiaute " + fileName, 0);
+        MGSiap.toLogs(false, "Executando o Leiaute " + fileName, 0);
         try {
 
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -289,10 +285,10 @@ public class PensionistaController {
                         sb.append("Revisao inválido: '" + resultSet.getString("Revisao") + "', ");
                     }
                     if (!sbW.toString().equalsIgnoreCase(startLog)) {
-                        MGSiap.toLogs(sbW.toString(), MGSiap.WARNING_TYPE);
+                        MGSiap.toLogs(false, sbW.toString(), MGSiap.WARNING_TYPE);
                     }
                     if (!sb.toString().equalsIgnoreCase(startLog)) {
-                        MGSiap.toLogs(sb.toString(), MGSiap.ERROR_TYPE);
+                        MGSiap.toLogs(false, sb.toString(), MGSiap.ERROR_TYPE);
                         if (error == false)
                             error = true;
                     } else {
@@ -325,16 +321,16 @@ public class PensionistaController {
 
             if (gerarXml)
                 try {
-                    String xmlFilePath = MGSiap.getFileFolder() + fileName;
+                    String xmlFilePath = MGSiap.getFileFolder(1) + fileName;
                     if (error)
-                        xmlFilePath = MGSiap.getFileFolder() + "Com_Erros_" + fileName;
+                        xmlFilePath = MGSiap.getFileFolder(1) + "Com_Erros_" + fileName;
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                     Transformer transformer = transformerFactory.newTransformer();
                     DOMSource domSource = new DOMSource(document);
                     StreamResult streamResult = new StreamResult(new File(xmlFilePath));
-
                     transformer.transform(domSource, streamResult);
-                    MGSiap.toLogs("Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
+                    
+                    MGSiap.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
 
                     ResultSet tabelaAuxiliares = bDCommands.getTabelaGenerico("", "", "",
                             "select count(*) from auxiliares where dominio = 'siap' "

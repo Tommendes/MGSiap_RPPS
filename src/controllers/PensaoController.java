@@ -113,7 +113,7 @@ public class PensaoController {
     }
 
     public void toXmlFile(ResultSet resultSet) {
-        MGSiap.toLogs("Executando o Leiaute " + fileName, 0);
+        MGSiap.toLogs(false, "Executando o Leiaute " + fileName, 0);
         try {
 
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -252,10 +252,10 @@ public class PensaoController {
                         sb.append("Valor da pensão inválido, ");
                     }
                     if (!sbW.toString().equalsIgnoreCase(startLog)) {
-                        MGSiap.toLogs(sbW.toString(), MGSiap.WARNING_TYPE);
+                        MGSiap.toLogs(false, sbW.toString(), MGSiap.WARNING_TYPE);
                     }
                     if (!sb.toString().equalsIgnoreCase(startLog)) {
-                        MGSiap.toLogs(sb.toString(), MGSiap.ERROR_TYPE);
+                        MGSiap.toLogs(false, sb.toString(), MGSiap.ERROR_TYPE);
                         if (error == false)
                             error = true;
                     } else {
@@ -285,16 +285,16 @@ public class PensaoController {
 
             if (gerarXml)
                 try {
-                    String xmlFilePath = MGSiap.getFileFolder() + fileName;
+                    String xmlFilePath = MGSiap.getFileFolder(1) + fileName;
                     if (error)
-                        xmlFilePath = MGSiap.getFileFolder() + "Com_Erros_" + fileName;
+                        xmlFilePath = MGSiap.getFileFolder(1) + "Com_Erros_" + fileName;
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                     Transformer transformer = transformerFactory.newTransformer();
                     DOMSource domSource = new DOMSource(document);
                     StreamResult streamResult = new StreamResult(new File(xmlFilePath));
-
                     transformer.transform(domSource, streamResult);
-                    MGSiap.toLogs("Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
+                    
+                    MGSiap.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
 
                     ResultSet tabelaAuxiliares = bDCommands.getTabelaGenerico("", "", "",
                             "select count(*) from auxiliares where dominio = 'siap' "

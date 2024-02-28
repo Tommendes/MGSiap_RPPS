@@ -1,0 +1,4 @@
+Servidor ANTONIO DE FARIAS NETO (00100120) (Pensionista): NumeroAto inválido: 'Não informado(a)', DataAto inválido: 'Não informado(a)', VeiculoPublicacao inválido: 'Não informado(a)'
+Servidor EDLENE CAVALCANTE FARIAS (00003008) (Pensionista): NumeroAto inválido: 'Não informado(a)', DataAto inválido: 'Não informado(a)', VeiculoPublicacao inválido: 'Não informado(a)'
+Servidor GENILDA MARIA DE OLIVEIRA (00100107) (Pensionista): NumeroAto inválido: 'Não informado(a)', DataAto inválido: 'Não informado(a)', VeiculoPublicacao inválido: 'Não informado(a)'
+Servidor MARIA CLEUVANIA ACIOLE DOS SANTOS (00003009) (Pensionista): NumeroAto inválido: 'Não informado(a)', DataAto inválido: 'Não informado(a)', VeiculoPublicacao inválido: 'Não informado(a)'
