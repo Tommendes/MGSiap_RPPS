@@ -5,8 +5,4 @@ test
 build
 bin
 
-# netbeans project files
-dist
-distapp
-
 #vscode files
