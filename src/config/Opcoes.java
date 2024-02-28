@@ -8,7 +8,7 @@ package config;
 import java.time.ZoneId;
 import java.util.Date;
 
-import mgsiap.MGSiap;
+import mgsiap.MGSiapRPPS;
 
 /**
  *
@@ -150,25 +150,25 @@ public class Opcoes {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("Opcoes{ano=").append(ano);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", mes=").append(mes);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", complementar=").append(complementar);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", codigoOrgao=").append(codigoOrgao);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", titulo=").append(titulo);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", descricao=").append(descricao);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", order=").append(order);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", build=").append(build);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append(", version=").append(version);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append('}');
         return sb.toString();
     }

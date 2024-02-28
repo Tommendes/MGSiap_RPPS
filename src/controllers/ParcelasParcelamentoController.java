@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import config.BDCommands;
-import mgsiap.MGSiap;
+import mgsiap.MGSiapRPPS;
 
 /**
  *
@@ -48,7 +48,7 @@ public class ParcelasParcelamentoController {
     }
 
     public void toXmlFile(ResultSet resultSet) {
-        MGSiap.toLogs(false, "Executando o Leiaute " + fileName, 0);
+        MGSiapRPPS.toLogs(false, "Executando o Leiaute " + fileName, 0);
         try {
 
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -63,9 +63,9 @@ public class ParcelasParcelamentoController {
             Element mes = document.createElement("Mes");
 
             codigo.appendChild(
-                    document.createTextNode(MGSiap.getOpcoes().getCodigoOrgao().substring(0, 6)));
-            exercicio.appendChild(document.createTextNode(MGSiap.getOpcoes().getAno()));
-            mes.appendChild(document.createTextNode(MGSiap.getOpcoes().getMes()));
+                    document.createTextNode(MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6)));
+            exercicio.appendChild(document.createTextNode(MGSiapRPPS.getOpcoes().getAno()));
+            mes.appendChild(document.createTextNode(MGSiapRPPS.getOpcoes().getMes()));
 
             root.appendChild(codigo);
             root.appendChild(exercicio);
@@ -73,14 +73,14 @@ public class ParcelasParcelamentoController {
 
             if (gerarXml)
                 try {
-                    String xmlFilePath = MGSiap.getFileFolder(1) + fileName;
+                    String xmlFilePath = MGSiapRPPS.getFileFolder(1) + fileName;
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                     Transformer transformer = transformerFactory.newTransformer();
                     DOMSource domSource = new DOMSource(document);
                     StreamResult streamResult = new StreamResult(new File(xmlFilePath));
                     transformer.transform(domSource, streamResult);
                     
-                    MGSiap.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
+                    MGSiapRPPS.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
 
                     ResultSet tabelaAuxiliares = bDCommands.getTabelaGenerico("", "", "",
                             "select count(*) from auxiliares where dominio = 'siap' "

@@ -67,7 +67,7 @@ import controllers.VinculoRPPSController;
  *
  * @author TomMe
  */
-public final class MGSiap extends javax.swing.JFrame {
+public final class MGSiapRPPS extends javax.swing.JFrame {
 
     private static BDCommands bDCommands;
     private static Connection conn;
@@ -139,7 +139,7 @@ public final class MGSiap extends javax.swing.JFrame {
      *
      * @param args
      */
-    public MGSiap(String[] args) {
+    public MGSiapRPPS(String[] args) {
         initComponents();
         setSiapOrgaos();
         setYears();
@@ -527,8 +527,8 @@ public final class MGSiap extends javax.swing.JFrame {
     }// GEN-LAST:event_btnVisualizarActionPerformed
 
     private void cbAnoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cbAnoActionPerformed
-        MGSiap.getOpcoes().setAno(cbAno.getModel().getSelectedItem().toString());
-        getbDCommands().listMeses(getConn(), cbMes, MGSiap.getOpcoes().getAno());
+        MGSiapRPPS.getOpcoes().setAno(cbAno.getModel().getSelectedItem().toString());
+        getbDCommands().listMeses(getConn(), cbMes, MGSiapRPPS.getOpcoes().getAno());
         Integer mes = (new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().getMonthValue());
         if (getShell().equals("--"))
             setSelectedValue(cbMes, String.format("%02d", mes));
@@ -536,14 +536,14 @@ public final class MGSiap extends javax.swing.JFrame {
 
     private void cbMesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cbMesActionPerformed
         if (getShell().equals("-p")) {
-            setSelectedValue(cbMes, MGSiap.getOpcoes().getMes());
+            setSelectedValue(cbMes, MGSiapRPPS.getOpcoes().getMes());
         } else {
             if (cbMes.getItemCount() > 0) {
-                MGSiap.getOpcoes().setMes(cbMes.getModel().getSelectedItem().toString());
+                MGSiapRPPS.getOpcoes().setMes(cbMes.getModel().getSelectedItem().toString());
             }
         }
-        getbDCommands().listComplementares(getConn(), cbComplementar, MGSiap.getOpcoes().getAno(),
-                MGSiap.getOpcoes().getMes());
+        getbDCommands().listComplementares(getConn(), cbComplementar, MGSiapRPPS.getOpcoes().getAno(),
+                MGSiapRPPS.getOpcoes().getMes());
         if (getShell().equals("--"))
             cbComplementar.setSelectedItem(0);
     }// GEN-LAST:event_cbMesActionPerformed
@@ -562,14 +562,14 @@ public final class MGSiap extends javax.swing.JFrame {
             if (fileE.isFile())
                 Desktop.getDesktop().open(fileE);
         } catch (IOException ex) {
-            Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             File fileW = new File(myWarningObj.toPath().toString());
             if (fileW.isFile())
                 Desktop.getDesktop().open(fileW);
         } catch (IOException ex) {
-            Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
         }
     }// GEN-LAST:event_jBtnLogsActionPerformed
 
@@ -578,17 +578,17 @@ public final class MGSiap extends javax.swing.JFrame {
             File folder = new File(SIAP_ROOT);
             Desktop.getDesktop().open(folder);
         } catch (IOException ex) {
-            Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void cbComplementarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cbComplementarActionPerformed
         if (cbComplementar.getItemCount() > 0)
-            MGSiap.getOpcoes().setComplementar(cbComplementar.getModel().getSelectedItem().toString());
+            MGSiapRPPS.getOpcoes().setComplementar(cbComplementar.getModel().getSelectedItem().toString());
     }// GEN-LAST:event_cbComplementarActionPerformed
 
     private void cbCodigoOrgaoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cbCodigoOrgaoActionPerformed
-        MGSiap.getOpcoes().setCodigoOrgao(cbCodigoOrgao.getModel().getSelectedItem().toString());
+        MGSiapRPPS.getOpcoes().setCodigoOrgao(cbCodigoOrgao.getModel().getSelectedItem().toString());
     }// GEN-LAST:event_cbCodigoOrgaoActionPerformed
 
     /**
@@ -614,7 +614,7 @@ public final class MGSiap extends javax.swing.JFrame {
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | javax.swing.UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
         }
         // </editor-fold>
         UIManager.put("OptionPane.yesButtonText", "Confirmar");
@@ -632,7 +632,7 @@ public final class MGSiap extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new MGSiap(args).setVisible(true);
+            new MGSiapRPPS(args).setVisible(true);
         });
     }
 
@@ -641,9 +641,9 @@ public final class MGSiap extends javax.swing.JFrame {
         // Caso seja acionado via shell
         if (args.length >= 4 && args[0].equals("-p")) {
             setShell(args[0]);
-            MGSiap.getOpcoes().setAno((String) args[1]);
-            MGSiap.getOpcoes().setMes((String) args[2]);
-            MGSiap.getOpcoes().setComplementar((String) args[3]);
+            MGSiapRPPS.getOpcoes().setAno((String) args[1]);
+            MGSiapRPPS.getOpcoes().setMes((String) args[2]);
+            MGSiapRPPS.getOpcoes().setComplementar((String) args[3]);
 
             setSelectedValue(cbAno, args[1]);
             setSelectedValue(cbMes, args[2]);
@@ -666,20 +666,20 @@ public final class MGSiap extends javax.swing.JFrame {
                         .toInstant()
                         .atZone(ZoneId.systemDefault())
                         .toLocalDateTime();
-                MGSiap.getOpcoes().setVersion(VERSION + "." + localDateTime.format(
+                MGSiapRPPS.getOpcoes().setVersion(VERSION + "." + localDateTime.format(
                         DateTimeFormatter.ofPattern("ddMMyy.HHmm")));
             } catch (IOException ex) {
-                Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        jlVersion.setText("V.: " + MGSiap.getOpcoes().getVersion());
+        jlVersion.setText("V.: " + MGSiapRPPS.getOpcoes().getVersion());
 
-        MGSiap.getOpcoes().setOrder("S.SERVIDOR");
+        MGSiapRPPS.getOpcoes().setOrder("S.SERVIDOR");
     }
 
     public static void initUpgrades() {
         Upgrades u = new Upgrades();
-        MGSiap.toLogs(false, u.upgrades(), UPGR_TYPE);
+        MGSiapRPPS.toLogs(false, u.upgrades(), UPGR_TYPE);
     }
 
     public static String getItemsFromList(List<String> dados, int countChars) {
@@ -715,7 +715,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static boolean getCanExecute() {
-        String cardug = MGSiap.cbCodigoOrgao.getSelectedItem().toString().substring(0, 4);
+        String cardug = MGSiapRPPS.cbCodigoOrgao.getSelectedItem().toString().substring(0, 4);
         if (cardug.trim().equals("null"))
             return false;
         else
@@ -731,19 +731,19 @@ public final class MGSiap extends javax.swing.JFrame {
                 orgaoCnpj = orgaoTo.getString("idorgao");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // Geração dos arquivos SIAP
-        MGSiap.getOpcoes().setTitulo(
-                "Geração de SIAP " + functions.getMesExtenso(MGSiap.getOpcoes().getMes()) + "/"
-                        + MGSiap.getOpcoes().getAno()
-                        + (MGSiap.getOpcoes().getComplementar().equals("000") ? ""
-                                : " - Complementar: " + MGSiap.getOpcoes().getComplementar()));
-        MGSiap.getOpcoes().setDescricao("CNPJ: " + orgaoCnpj);
+        MGSiapRPPS.getOpcoes().setTitulo(
+                "Geração de SIAP " + functions.getMesExtenso(MGSiapRPPS.getOpcoes().getMes()) + "/"
+                        + MGSiapRPPS.getOpcoes().getAno()
+                        + (MGSiapRPPS.getOpcoes().getComplementar().equals("000") ? ""
+                                : " - Complementar: " + MGSiapRPPS.getOpcoes().getComplementar()));
+        MGSiapRPPS.getOpcoes().setDescricao("CNPJ: " + orgaoCnpj);
 
         Opcoes.setTimeI(System.currentTimeMillis());
-        setNome(MGSiap.cbCodigoOrgao.getSelectedItem().toString().replaceAll(" ", "_"));
+        setNome(MGSiapRPPS.cbCodigoOrgao.getSelectedItem().toString().replaceAll(" ", "_"));
         // Criar a pasta Abertura
         File folder0 = new File(getFileFolder(0));
         // Criar a pasta Movimentação
@@ -754,47 +754,47 @@ public final class MGSiap extends javax.swing.JFrame {
             FileUtils.deleteDirectory(folder0);
             FileUtils.deleteDirectory(folder1);
             FileUtils.deleteDirectory(folder2);
-            MGSiap.toLogs(true, "Pasta " + folder0 + " excluída com sucesso", 0);
-            MGSiap.toLogs(true, "Pasta " + folder1 + " excluída com sucesso", 0);
-            MGSiap.toLogs(true, "Pasta " + folder2 + " excluída com sucesso", 0);
+            MGSiapRPPS.toLogs(false, "Pasta " + folder0 + " excluída com sucesso", 0);
+            MGSiapRPPS.toLogs(false, "Pasta " + folder1 + " excluída com sucesso", 0);
+            MGSiapRPPS.toLogs(false, "Pasta " + folder2 + " excluída com sucesso", 0);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Erro ao tentar excluir uma ou mais pastas");
+            MGSiapRPPS.toLogs(true, "Erro ao tentar excluir uma ou mais pastas. Erro: " + e.getMessage(), ERROR_TYPE);
         }
         try {
             if (!folder0.exists()) {
                 folder0.mkdirs();
-                MGSiap.toLogs(true, "Pasta " + folder0.getName() + " recriada", 0);
+                MGSiapRPPS.toLogs(false, "Pasta " + folder0.getName() + " recriada", 0);
             }
             if (!folder1.exists()) {
                 folder1.mkdirs();
-                MGSiap.toLogs(true, "Pasta " + folder1.getName() + " recriada", 0);
+                MGSiapRPPS.toLogs(false, "Pasta " + folder1.getName() + " recriada", 0);
             }
             if (!folder2.exists()) {
                 folder2.mkdirs();
-                MGSiap.toLogs(true, "Pasta " + folder2.getName() + " recriada", 0);
+                MGSiapRPPS.toLogs(false, "Pasta " + folder2.getName() + " recriada", 0);
             }
         } catch (Exception e) {
-            MGSiap.toLogs(true, e.getMessage(), ERROR_TYPE);
+            MGSiapRPPS.toLogs(true, "Erro ao tentar criar uma ou mais pastas. Erro: " + e.getMessage(), ERROR_TYPE);
         }
         myLogObj = new File(
                 SIAP_ROOT + "log_erros_" + nome.substring(7) + "_" + nome.substring(0, 6) + "_"
-                        + MGSiap.getOpcoes().getAno() + "_" + MGSiap.getOpcoes().getMes()
+                        + MGSiapRPPS.getOpcoes().getAno() + "_" + MGSiapRPPS.getOpcoes().getMes()
                                 .replace(" ", "_")
                         + ".txt");
         myWarningObj = new File(
                 SIAP_ROOT + "log_erros_que_nao_impedem_a_transmissao_" + nome.substring(7) + "_" + nome.substring(0, 6)
                         + "_"
-                        + MGSiap.getOpcoes().getAno() + "_" + MGSiap.getOpcoes().getMes()
+                        + MGSiapRPPS.getOpcoes().getAno() + "_" + MGSiapRPPS.getOpcoes().getMes()
                                 .replace(" ", "_")
                         + ".txt");
         try {
             FileUtils.deleteQuietly(myLogObj);
-            MGSiap.toLogs(true, "Arquivo de log de erros excluído com sucesso", 0);
+            MGSiapRPPS.toLogs(false, "Arquivo de log de erros excluído com sucesso", 0);
             FileUtils.deleteQuietly(myWarningObj);
-            MGSiap.toLogs(true, "Arquivo de log de avisos excluído com sucesso", 0);
+            MGSiapRPPS.toLogs(false, "Arquivo de log de avisos excluído com sucesso", 0);
         } catch (Exception e) {
-            MGSiap.toLogs(true, e.getMessage(), ERROR_TYPE);
+            MGSiapRPPS.toLogs(true, "Erro ao tentar excluir uma ou mais arquivos de log. Erro: " + e.getMessage(), ERROR_TYPE);
         }
 
         // System.exit(0);
@@ -910,7 +910,7 @@ public final class MGSiap extends javax.swing.JFrame {
             ResultadoAtuarialController.toXmlFile(rsResultadoAtuarial);
 
         } catch (Exception ex) {
-            Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             if (jTAErrors.getText().trim().length() > 0 || jTAWarnings.getText().trim().length() > 0) {
                 jBtnLogs.setVisible(true);
@@ -918,7 +918,7 @@ public final class MGSiap extends javax.swing.JFrame {
             jBtnFolder.setVisible(true);
             boolean errorsWarning = false;
             if (getErrorsCount() > 0 && getWarningsCount() > 0) {
-                MGSiap.toLogs(false, 
+                MGSiapRPPS.toLogs(false, 
                         "Os Arquivos XML foram gerados com " + getErrorsCount() + " erros e "
                                 + getWarningsCount() + " avisos que TEMPORARIAMENTE NÃO IMPEDEM A TRANSMISSÃO",
                         0);
@@ -932,12 +932,12 @@ public final class MGSiap extends javax.swing.JFrame {
                     Arrays.sort(erros);
                     jTAErrors.setText("");
                     for (String erro : erros) {
-                        MGSiap.toLogs(false, erro, MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.toLogs(false, erro, MGSiapRPPS.ERROR_TYPE);
                     }
                     /* Fim de ordenar erros */
                     if (getErrorsCount() > 0) {
                         if (!errorsWarning) {
-                            MGSiap.toLogs(false, "Os Arquivos XML foram gerados com " + getErrorsCount() + " erros",
+                            MGSiapRPPS.toLogs(false, "Os Arquivos XML foram gerados com " + getErrorsCount() + " erros",
                                     0);
                             errorsWarning = true;
                         }
@@ -948,7 +948,7 @@ public final class MGSiap extends javax.swing.JFrame {
                             msg = msg.substring(0, maxMsgLength);
                         }
                         msg = msg + "....txt. Favor verificar e corrigir";
-                        MGSiap.toLogs(false, msg, 0);
+                        MGSiapRPPS.toLogs(false, msg, 0);
                     }
                     try (BufferedWriter logWriter = new BufferedWriter(
                             new FileWriterWithEncoding(myLogObj.toPath().toString(), StandardCharsets.UTF_8,
@@ -958,7 +958,7 @@ public final class MGSiap extends javax.swing.JFrame {
                     }
                 }
             } catch (IOException ex) {
-                Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
                 if (getWarningsCount() > 0) {
@@ -968,13 +968,13 @@ public final class MGSiap extends javax.swing.JFrame {
                     Arrays.sort(avisos);
                     jTAWarnings.setText("");
                     for (String aviso : avisos) {
-                        MGSiap.toLogs(false, aviso, MGSiap.WARNING_TYPE);
+                        MGSiapRPPS.toLogs(false, aviso, MGSiapRPPS.WARNING_TYPE);
                     }
                     jTAWarnings.setCaretPosition(0);
                     /* Fim de ordenar avisos */
                     if (getWarningsCount() > 0) {
                         if (!errorsWarning) {
-                            MGSiap.toLogs(false, 
+                            MGSiapRPPS.toLogs(false, 
                                     "Os Arquivos XML foram gerados com " + getWarningsCount()
                                             + " avisos que TEMPORARIAMENTE NÃO IMPEDEM A TRANSMISSÃO",
                                     0);
@@ -987,7 +987,7 @@ public final class MGSiap extends javax.swing.JFrame {
                             msg = msg.substring(0, maxMsgLength);
                         }
                         msg = msg + "....txt. Favor verificar e corrigir";
-                        MGSiap.toLogs(false, msg, 0);
+                        MGSiapRPPS.toLogs(false, msg, 0);
                     }
                     try (BufferedWriter warningWriter = new BufferedWriter(
                             new FileWriterWithEncoding(myWarningObj.toPath().toString(), StandardCharsets.UTF_8,
@@ -997,7 +997,7 @@ public final class MGSiap extends javax.swing.JFrame {
                     }
                 }
             } catch (IOException ex) {
-                Logger.getLogger(MGSiap.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 jTAErrors.setCaretPosition(0);
                 jTAWarnings.setCaretPosition(0);
@@ -1065,22 +1065,22 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setConn(Connection conn) {
-        MGSiap.conn = conn;
+        MGSiapRPPS.conn = conn;
     }
 
     public static void setErrorsCount(int type) {
         if (type == ERROR_TYPE)
-            MGSiap.errorsCount++;
+            MGSiapRPPS.errorsCount++;
         else if (type == WARNING_TYPE)
-            MGSiap.warningsCount++;
+            MGSiapRPPS.warningsCount++;
     }
 
     public static Integer getErrorsCount() {
-        return MGSiap.errorsCount;
+        return MGSiapRPPS.errorsCount;
     }
 
     public static Integer getWarningsCount() {
-        return MGSiap.warningsCount;
+        return MGSiapRPPS.warningsCount;
     }
 
     public static Opcoes getOpcoes() {
@@ -1088,7 +1088,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setOpcoes(Opcoes opcoes) {
-        MGSiap.opcoes = opcoes;
+        MGSiapRPPS.opcoes = opcoes;
     }
 
     public static BDCommands getbDCommands() {
@@ -1096,7 +1096,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setbDCommands(BDCommands bDCommands) {
-        MGSiap.bDCommands = bDCommands;
+        MGSiapRPPS.bDCommands = bDCommands;
     }
 
     public static String getShell() {
@@ -1104,7 +1104,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setShell(String shell) {
-        MGSiap.shell = shell;
+        MGSiapRPPS.shell = shell;
     }
 
     public static Long getTimeI() {
@@ -1112,7 +1112,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setTimeI(Long timeI) {
-        MGSiap.timeI = timeI;
+        MGSiapRPPS.timeI = timeI;
     }
 
     public static Long getTimeF() {
@@ -1120,7 +1120,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setTimeF(Long timeF) {
-        MGSiap.timeF = timeF;
+        MGSiapRPPS.timeF = timeF;
     }
 
     public static Long getTimeLeft() {
@@ -1128,7 +1128,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setTimeLeft(Long timeLeft) {
-        MGSiap.timeLeft = timeLeft;
+        MGSiapRPPS.timeLeft = timeLeft;
     }
 
     public static JLabel getJltOper() {
@@ -1136,7 +1136,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setJltOper(JLabel jltOper) {
-        MGSiap.jltOper = jltOper;
+        MGSiapRPPS.jltOper = jltOper;
     }
 
     public JButton getBtnFechar() {
@@ -1152,7 +1152,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setBtnVisualizar(JButton btnVisualizar) {
-        MGSiap.btnVisualizar = btnVisualizar;
+        MGSiapRPPS.btnVisualizar = btnVisualizar;
     }
 
     public ButtonGroup getButtonGroup1() {
@@ -1176,7 +1176,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setCbAno(JComboBox<String> cbAno) {
-        MGSiap.cbAno = cbAno;
+        MGSiapRPPS.cbAno = cbAno;
     }
 
     public static JComboBox<String> getCbComplementar() {
@@ -1184,7 +1184,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setCbComplementar(JComboBox<String> cbComplementar) {
-        MGSiap.cbComplementar = cbComplementar;
+        MGSiapRPPS.cbComplementar = cbComplementar;
     }
 
     public static JComboBox<String> getCbMes() {
@@ -1192,7 +1192,7 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setCbMes(JComboBox<String> cbMes) {
-        MGSiap.cbMes = cbMes;
+        MGSiapRPPS.cbMes = cbMes;
     }
 
     public javax.swing.JFormattedTextField getJFormattedTextField5() {
@@ -1301,7 +1301,7 @@ public final class MGSiap extends javax.swing.JFrame {
 
     public static String getFileFolder(int tipo) {
         String fileFolder = getNome().substring(7) + "_" + getNome().substring(0, 6) + "_"
-                + MGSiap.getOpcoes().getAno() + "_" + MGSiap.getOpcoes().getMes().replace(" ", "_") + "/";
+                + MGSiapRPPS.getOpcoes().getAno() + "_" + MGSiapRPPS.getOpcoes().getMes().replace(" ", "_") + "/";
         String fileFolderMounted = SIAP_ROOT + '/' + fileFolder + '/';
         switch (tipo) {
             case 0:
@@ -1321,10 +1321,10 @@ public final class MGSiap extends javax.swing.JFrame {
     }
 
     public static void setNome(String nome) {
-        MGSiap.nome = nome;
+        MGSiapRPPS.nome = nome;
     }
 
     public static String getNome() {
-        return MGSiap.nome;
+        return MGSiapRPPS.nome;
     }
 }

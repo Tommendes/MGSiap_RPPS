@@ -4,7 +4,7 @@
  */
 package models;
 
-import mgsiap.MGSiap;
+import mgsiap.MGSiapRPPS;
 
 /**
  *
@@ -82,23 +82,23 @@ public class ProgressaoCargo {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("ProgressaoCargo{Codigo=").append(Codigo);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("Nome=").append(Nome);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("CodigoCargo=").append(CodigoCargo);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("CodigoClasse=").append(CodigoClasse);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("CodigoNivel=").append(CodigoNivel);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("ValorSalario=").append(ValorSalario);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("ValorSalario=").append(ValorSalario);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("model=").append(model);
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append('}');
         return sb.toString();
     }

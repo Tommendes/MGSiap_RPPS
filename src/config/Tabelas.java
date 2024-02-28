@@ -4,7 +4,7 @@
  */
 package config;
 
-import mgsiap.MGSiap;
+import mgsiap.MGSiapRPPS;
 
 /**
  *
@@ -17,17 +17,17 @@ public class Tabelas {
 
     public String VeiculosPublicacao(String value) {
         StringBuilder sb = new StringBuilder();
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("1 Diário Oficial da União").append("\n");
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("2 Diário Oficial do Estado de Alagoas").append("\n");
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("3 Diário Oficial do Tribunal de Contas de Alagoas").append("\n");
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("4 Diário Oficial da Associação de Municípios de Alagoas").append("\n");
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("5 Diário Oficial Próprio").append("\n");
-        MGSiap.setErrorsCount(MGSiap.WARNING_TYPE);
+        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
         sb.append("6 Boletim Interno Próprio").append("\n");
         return sb.toString();
     }

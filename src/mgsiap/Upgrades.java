@@ -8,10 +8,10 @@ public class Upgrades {
     public String upgrades() {
         StringBuilder sb = new StringBuilder();
         // sb.append(" " + "\n");
-        sb.append("26 de fevereiro de 2024: v. " + MGSiap.VERSION + "\n");
+        sb.append("26 de fevereiro de 2024: v. " + MGSiapRPPS.VERSION + "\n");
         sb.append("      1. Novo leiaute" + "\n");
         sb.append("      2. Exclusão dos leiautes do RPPS do envio habitual" + "\n");
-        sb.append("27 de julho de 2023: v. " + MGSiap.VERSION + "\n");
+        sb.append("27 de julho de 2023: v. " + MGSiapRPPS.VERSION + "\n");
         sb.append("      1. Nova correção na geração do arquivo Servidores.xml" + "\n");
         sb.append("26 de julho de 2023: v. 0.48" + "\n");
         sb.append("      1. Nova correção na geração do arquivo Servidores.xml" + "\n");

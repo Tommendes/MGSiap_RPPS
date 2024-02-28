@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import config.BDCommands;
-import mgsiap.MGSiap;
+import mgsiap.MGSiapRPPS;
 import validations.Validations;
 
 /**
@@ -53,20 +53,20 @@ public class DependenteRPPSController {
                 + "left join CENTROS C on C.IDCENTRO = M.IDCENTRO "
                 + "left join SIAPORGAO SO on SO.C_UA = C.CODIGO_UA and SO.CNPJ = replace(replace(replace(C.CNPJ_UA, '/', ''), '-', ''), '.', '') "
                 + "where s.idservidor between '" + idBeneficiarioI + "' AND '" + idBeneficiarioF + "' "
-                + "and ano = '" + MGSiap.getOpcoes().getAno() + "' and mes = '"
-                + MGSiap.getOpcoes().getMes() + "' "
+                + "and ano = '" + MGSiapRPPS.getOpcoes().getAno() + "' and mes = '"
+                + MGSiapRPPS.getOpcoes().getMes() + "' "
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
                 + "and S.IDVINCULO in ('4', '5') "
-                + "and so.cardug = '" + MGSiap.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
+                + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
         return tabelaRecebe;
     }
 
     public void toXmlFile(ResultSet resultSet) {
-        MGSiap.toLogs(false, "Executando o Leiaute " + fileName, 0);
+        MGSiapRPPS.toLogs(false, "Executando o Leiaute " + fileName, 0);
         try {
 
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -81,9 +81,9 @@ public class DependenteRPPSController {
             Element mes = document.createElement("Mes");
 
             codigo.appendChild(
-                    document.createTextNode(MGSiap.getOpcoes().getCodigoOrgao().substring(0, 6)));
-            exercicio.appendChild(document.createTextNode(MGSiap.getOpcoes().getAno()));
-            mes.appendChild(document.createTextNode(MGSiap.getOpcoes().getMes()));
+                    document.createTextNode(MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6)));
+            exercicio.appendChild(document.createTextNode(MGSiapRPPS.getOpcoes().getAno()));
+            mes.appendChild(document.createTextNode(MGSiapRPPS.getOpcoes().getMes()));
 
             root.appendChild(codigo);
             root.appendChild(exercicio);
@@ -117,7 +117,7 @@ public class DependenteRPPSController {
                                 document.createTextNode(resultSet.getString("CPF")
                                         .trim().replaceAll("[^0-9]", "")));
                     } else {
-                        MGSiap.setErrorsCount(MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("CPF inválido: '"
                                 + v.isNumberOrEmpty(resultSet.getString("CPF"), 11, "R")
                                         .trim());
@@ -132,7 +132,7 @@ public class DependenteRPPSController {
                                 document.createTextNode(resultSet.getString("CPF_DEP")
                                         .trim().replaceAll("[^0-9]", "")));
                     } else {
-                        MGSiap.setErrorsCount(MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("CPF Dependente inválido: '"
                                 + v.isNumberOrEmpty(resultSet.getString("CPF_DEP"), 11, "R")
                                         .trim() + "', ");
@@ -145,7 +145,7 @@ public class DependenteRPPSController {
                                                 "dependente"), 255, "R")
                                         .trim()));
                     } else {
-                        MGSiap.setErrorsCount(MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("NomeDependente inválido: '" + resultSet.getString("dependente") + "', ");
                     }
                     // DataNascimento
@@ -156,7 +156,7 @@ public class DependenteRPPSController {
                                                 "D_NASCIMENTO"))
                                         .trim()));
                     } else {
-                        MGSiap.setErrorsCount(MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("Data Nascimento inválida: '"
                                 + v.isValueOrEmpty(resultSet.getString("D_NASCIMENTO"))
                                 + "', ");
@@ -205,15 +205,15 @@ public class DependenteRPPSController {
                         }
                         GrauParentesco.appendChild(document.createTextNode(grauParentesco));
                     } else {
-                        MGSiap.setErrorsCount(MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("TIPO de dependência inválida: '" + resultSet.getString("TIPO") + "', ");
                     }
 
                     if (!sbW.toString().equalsIgnoreCase(startLog)) {
-                        MGSiap.toLogs(false, sbW.toString(), MGSiap.WARNING_TYPE);
+                        MGSiapRPPS.toLogs(false, sbW.toString(), MGSiapRPPS.WARNING_TYPE);
                     }
                     if (!sb.toString().equalsIgnoreCase(startLog)) {
-                        MGSiap.toLogs(false, sb.toString(), MGSiap.ERROR_TYPE);
+                        MGSiapRPPS.toLogs(false, sb.toString(), MGSiapRPPS.ERROR_TYPE);
                         if (error == false)
                             error = true;
                     } else {
@@ -237,15 +237,15 @@ public class DependenteRPPSController {
 
             if (gerarXml)
                 try {
-                    String xmlFilePath = MGSiap.getFileFolder(1) + fileName;
+                    String xmlFilePath = MGSiapRPPS.getFileFolder(1) + fileName;
                     if (error)
-                        xmlFilePath = MGSiap.getFileFolder(1) + "Com_Erros_" + fileName;
+                        xmlFilePath = MGSiapRPPS.getFileFolder(1) + "Com_Erros_" + fileName;
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                     Transformer transformer = transformerFactory.newTransformer();
                     DOMSource domSource = new DOMSource(document);
                     StreamResult streamResult = new StreamResult(new File(xmlFilePath));
                     transformer.transform(domSource, streamResult);
-                    MGSiap.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
+                    MGSiapRPPS.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
 
                     ResultSet tabelaAuxiliares = bDCommands.getTabelaGenerico("", "", "",
                             "select count(*) from auxiliares where dominio = 'siap' "
