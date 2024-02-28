@@ -656,9 +656,9 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
         }
         // Fim de caso seja acionado via shell
 
-        File file = new File(System.getProperty("user.dir") + "/MGSiap.jar");
+        File file = new File(System.getProperty("user.dir") + "/MGSiapRPPS.jar");
         if (file.isFile()) {
-            Path path = Paths.get(System.getProperty("user.dir") + "/MGSiap.jar");
+            Path path = Paths.get(System.getProperty("user.dir") + "/MGSiapRPPS.jar");
             BasicFileAttributes attr;
             try {
                 attr = Files.readAttributes(path, BasicFileAttributes.class);
