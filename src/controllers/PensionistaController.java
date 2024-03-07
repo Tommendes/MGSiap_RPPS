@@ -75,7 +75,7 @@ public class PensionistaController {
                 + "and md.retorna = 'Desligamento' and f.tipo = 'C'"
                 + "group by " + select.replace(" CPFPensionista", "").replace(" MatPensionista", "")
                 + " order by s.servidor";
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, true);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
         return tabelaRecebe;
     }
 

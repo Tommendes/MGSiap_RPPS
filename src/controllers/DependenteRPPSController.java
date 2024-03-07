@@ -61,7 +61,7 @@ public class DependenteRPPSController {
                 + "and S.IDVINCULO in ('4', '5') "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, true);
         return tabelaRecebe;
     }
 

@@ -87,7 +87,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
 
     private static String nome;
 
-    public static String VERSION = "0.01";
+    public static String VERSION = "0.03";
 
     public static final String BD_ROOT = System.getProperty("user.dir");// "C:/Windows/MGFolha/";//"C:\\Windows\\MGFolha";//
     public static final String SIAP_ROOT = BD_ROOT + "/SIAP_RPPS/";// "C:/Windows/MGFolha/SIAP_RPPS/";//"C:\\Fontes\\Mega\\MGFolha\\SIAP_RPPS\\";////"C:\\Windows\\MGFolha\\SIAP_RPPS\\";//
@@ -151,7 +151,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
         initUpgrades();
         jTbPanLogs.setSelectedIndex(UPGR_TYPE);
         jTAUpgrade.setCaretPosition(0);
-        setTitle("Geração de SIAP");
+        setTitle("Geração de SIAP - RPPS");
         // Criar a pasta SIAP-RPPS
         // File folder = new File(SIAP_ROOT);
         // if (!folder.exists()) {
@@ -188,9 +188,10 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
         if (log == true) {
             System.out.println("Retorno (toLogs): " + msgs);
         }
-        if (type == ERROR_TYPE) {
-            System.exit(ERROR);
-        }
+        // if (type == ERROR_TYPE) {
+        //     System.out.println(msgs);
+        //     System.exit(ERROR);
+        // }
         jTbPanLogs.setSelectedIndex(type);
     }
 
@@ -736,7 +737,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
 
         // Geração dos arquivos SIAP
         MGSiapRPPS.getOpcoes().setTitulo(
-                "Geração de SIAP " + functions.getMesExtenso(MGSiapRPPS.getOpcoes().getMes()) + "/"
+                "Geração de SIAP - RPPS " + functions.getMesExtenso(MGSiapRPPS.getOpcoes().getMes()) + "/"
                         + MGSiapRPPS.getOpcoes().getAno()
                         + (MGSiapRPPS.getOpcoes().getComplementar().equals("000") ? ""
                                 : " - Complementar: " + MGSiapRPPS.getOpcoes().getComplementar()));
