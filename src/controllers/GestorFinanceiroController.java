@@ -42,7 +42,7 @@ public class GestorFinanceiroController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getGestorFinanceiroBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getGestorFinanceiroBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

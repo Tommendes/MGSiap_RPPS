@@ -152,6 +152,13 @@ public class BDCommands {
         }
     }
 
+    public void executeSql(String sql, boolean output) {
+        executeSql(sql);
+        if (output) {
+            System.out.println("SQL: " + sql);
+        }
+    }
+
     public void executeSql(String sql) {
         try {
             PreparedStatement ps;

@@ -42,7 +42,7 @@ public class PlanoCusteioController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getPlanoCusteioBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getPlanoCusteioBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

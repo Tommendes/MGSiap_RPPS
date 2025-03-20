@@ -67,7 +67,6 @@ public class PensaoController {
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                // + "and s.idvinculo != '11' " // Alterado no leiaute 1ª edição - Exercício 2024
                 + "and s.idvinculo not in('11') "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6)
                 + "' and (select sum(ff.n_valor) from financeiro ff where ff.idservidor = sp.idservidor and ff.ano = m.ano and ff.mes = m.mes "
@@ -102,11 +101,8 @@ public class PensaoController {
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                // + "and s.idvinculo != '11' " // Alterado no leiaute 1ª edição - Exercício 2024
                 + "and s.idvinculo not in('11') "
-                + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6)
-                + "' /*and (select sum(ff.n_valor) from financeiro ff where ff.idservidor = sp.idservidor and ff.ano = m.ano and ff.mes = m.mes "
-                + "and ff.parcela = m.parcela and ff.idevento in ('001','002','003') and ff.n_valor > 0 group by ff.idservidor) > 0*/ "
+                + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "and md.retorna = 'Desligamento' and f.tipo = 'C'";
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
         return tabelaRecebe;

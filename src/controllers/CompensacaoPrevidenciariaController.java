@@ -42,7 +42,7 @@ public class CompensacaoPrevidenciariaController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getCompensacaoPrevidenciariaBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getCompensacaoPrevidenciariaBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

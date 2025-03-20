@@ -42,7 +42,7 @@ public class CertificacaoRPPSController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getCertificacaoRPPSBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getCertificacaoRPPSBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -87,7 +88,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
 
     private static String nome;
 
-    public static String VERSION = "0.03";
+    public static String VERSION = "1.250320.1752";
 
     public static final String BD_ROOT = System.getProperty("user.dir");// "C:/Windows/MGFolha/";//"C:\\Windows\\MGFolha";//
     public static final String SIAP_ROOT = BD_ROOT + "/SIAP_RPPS/";// "C:/Windows/MGFolha/SIAP_RPPS/";//"C:\\Fontes\\Mega\\MGFolha\\SIAP_RPPS\\";////"C:\\Windows\\MGFolha\\SIAP_RPPS\\";//
@@ -155,8 +156,9 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
         // Criar a pasta SIAP-RPPS
         // File folder = new File(SIAP_ROOT);
         // if (!folder.exists()) {
-        //     folder.mkdirs();
-        //     MGSiap.toLogs(true, "Pasta root " + folder.getName() + " recriada em: " + folder.getAbsolutePath(), 0);
+        // folder.mkdirs();
+        // MGSiap.toLogs(true, "Pasta root " + folder.getName() + " recriada em: " +
+        // folder.getAbsolutePath(), 0);
         // }
     }
 
@@ -189,8 +191,8 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
             System.out.println("Retorno (toLogs): " + msgs);
         }
         // if (type == ERROR_TYPE) {
-        //     System.out.println(msgs);
-        //     System.exit(ERROR);
+        // System.out.println(msgs);
+        // System.exit(ERROR);
         // }
         jTbPanLogs.setSelectedIndex(type);
     }
@@ -657,22 +659,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
         }
         // Fim de caso seja acionado via shell
 
-        File file = new File(System.getProperty("user.dir") + "/MGSiapRPPS.jar");
-        if (file.isFile()) {
-            Path path = Paths.get(System.getProperty("user.dir") + "/MGSiapRPPS.jar");
-            BasicFileAttributes attr;
-            try {
-                attr = Files.readAttributes(path, BasicFileAttributes.class);
-                LocalDateTime localDateTime = attr.creationTime()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime();
-                MGSiapRPPS.getOpcoes().setVersion(VERSION + "." + localDateTime.format(
-                        DateTimeFormatter.ofPattern("ddMMyy.HHmm")));
-            } catch (IOException ex) {
-                Logger.getLogger(MGSiapRPPS.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        MGSiapRPPS.getOpcoes().setVersion(VERSION);
         jlVersion.setText("V.: " + MGSiapRPPS.getOpcoes().getVersion());
 
         MGSiapRPPS.getOpcoes().setOrder("S.SERVIDOR");
@@ -689,6 +676,11 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
             ret += "\"" + dados.get(i).substring(0, countChars) + "\",";
         }
         ret = ret.substring(0, ret.length() - 1);
+        return ret;
+    }
+
+    public static String getItemsFromList(List<String> dados, int countChars, boolean output) {
+        String ret = getItemsFromList(dados, countChars);
         System.out.println("Lista refeita: " + ret);
         return ret;
     }
@@ -725,6 +717,9 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
 
     public static void Execute() {
         timeI = System.currentTimeMillis();
+        bDCommands.executeSql(
+                "update FINANCEIRO set ADDATAINICIO = ADDATAATO where ADDATAINICIO is null and ADDATAATO is not null and ANO >= 2025",
+                true);
         String orgaoCnpj = "Não informado";
         try {
             ResultSet orgaoTo = bDCommands.getOrgao();
@@ -795,119 +790,122 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
             FileUtils.deleteQuietly(myWarningObj);
             MGSiapRPPS.toLogs(false, "Arquivo de log de avisos excluído com sucesso", 0);
         } catch (Exception e) {
-            MGSiapRPPS.toLogs(true, "Erro ao tentar excluir uma ou mais arquivos de log. Erro: " + e.getMessage(), ERROR_TYPE);
+            MGSiapRPPS.toLogs(true, "Erro ao tentar excluir uma ou mais arquivos de log. Erro: " + e.getMessage(),
+                    ERROR_TYPE);
         }
 
         // System.exit(0);
 
         try {
             /* Geração dos arquivos */
+            ArrayList<String> beneficiarios = new ArrayList<>();
+            /* Leiaute Beneficiario */
+            BeneficiarioController BeneficiarioController = new BeneficiarioController(bDCommands, geraBeneficiario,
+                    beneficiarios);
+            ResultSet rsBeneficiario = BeneficiarioController.getBeneficiarioBatch("00000000", "99999999");
+            BeneficiarioController.toXmlFile(rsBeneficiario);
+            String beneficiariosStr = getItemsFromList(beneficiarios, 8).replaceAll("\"", "\'");
             /* Leiaute RPPS */
             RPPSController RPPSController = new RPPSController(bDCommands, geraRPPS);
-            ResultSet rsRPPS = RPPSController.getRPPSBatch("00000000", "99999999");
+            ResultSet rsRPPS = RPPSController.getRPPSBatch(beneficiariosStr);
             RPPSController.toXmlFile(rsRPPS);
             /* Leiaute CertificacaoRPPS */
             CertificacaoRPPSController CertificacaoRPPSController = new CertificacaoRPPSController(bDCommands,
                     geraCertificacaoRPPS);
-            ResultSet rsCertificacaoRPPS = CertificacaoRPPSController.getCertificacaoRPPSBatch("00000000", "99999999");
+            ResultSet rsCertificacaoRPPS = CertificacaoRPPSController.getCertificacaoRPPSBatch(beneficiariosStr);
             CertificacaoRPPSController.toXmlFile(rsCertificacaoRPPS);
             /* Leiaute CertificadoRegularidadePrevidenciaria */
             CertificadoRegularidadePrevidenciariaController CertificadoRegularidadePrevidenciariaController = new CertificadoRegularidadePrevidenciariaController(
                     bDCommands, geraCertificadoRegularidadePrevidenciaria);
             ResultSet rsCertificadoRegularidadePrevidenciaria = CertificadoRegularidadePrevidenciariaController
-                    .getCertificadoRegularidadePrevidenciariaBatch("00000000", "99999999");
+                    .getCertificadoRegularidadePrevidenciariaBatch(beneficiariosStr);
             CertificadoRegularidadePrevidenciariaController.toXmlFile(rsCertificadoRegularidadePrevidenciaria);
             /* Leiaute GruposColegiados */
             GruposColegiadosController GruposColegiadosController = new GruposColegiadosController(bDCommands,
                     geraGruposColegiados);
-            ResultSet raGruposColegiados = GruposColegiadosController.getGruposColegiadosBatch("00000000", "99999999");
+            ResultSet raGruposColegiados = GruposColegiadosController.getGruposColegiadosBatch(beneficiariosStr);
             GruposColegiadosController.toXmlFile(raGruposColegiados);
             /* Leiaute MembroColegio */
             MembroColegioController MembroColegioController = new MembroColegioController(bDCommands,
                     geraMembroColegio);
-            ResultSet raMembroColegio = MembroColegioController.getMembroColegioBatch("00000000", "99999999");
+            ResultSet raMembroColegio = MembroColegioController.getMembroColegioBatch(beneficiariosStr);
             MembroColegioController.toXmlFile(raMembroColegio);
-            /* Leiaute Beneficiario */
-            BeneficiarioController BeneficiarioController = new BeneficiarioController(bDCommands, geraBeneficiario);
-            ResultSet rsBeneficiario = BeneficiarioController.getBeneficiarioBatch("00000000", "99999999");
-            BeneficiarioController.toXmlFile(rsBeneficiario);
             /* Leiaute DependenteRPPS */
             DependenteRPPSController DependenteRPPSController = new DependenteRPPSController(bDCommands,
                     geraDependenteRPPS);
-            ResultSet rsDependenteRPPS = DependenteRPPSController.getDependenteRPPSBatch("00000000", "99999999");
+            ResultSet rsDependenteRPPS = DependenteRPPSController.getDependenteRPPSBatch(beneficiariosStr);
             DependenteRPPSController.toXmlFile(rsDependenteRPPS);
             /* Leiaute VinculoRPPS */
             VinculoRPPSController VinculoRPPSController = new VinculoRPPSController(bDCommands, geraVinculoRPPS);
-            ResultSet rsVinculoRPPS = VinculoRPPSController.getVinculoRPPSBatch("00000000", "99999999");
+            ResultSet rsVinculoRPPS = VinculoRPPSController.getVinculoRPPSBatch(beneficiariosStr);
             VinculoRPPSController.toXmlFile(rsVinculoRPPS);
             /* Leiaute Pensionista */
             PensionistaController PensionistaController = new PensionistaController(bDCommands, geraPensionista);
-            ResultSet rsPensionista = PensionistaController.getPensionistaBatch("00000000", "99999999");
+            ResultSet rsPensionista = PensionistaController.getPensionistaBatch(beneficiariosStr);
             PensionistaController.toXmlFile(rsPensionista);
             /* Leiaute AposentadoriaConcedida */
             AposentadoriaConcedidaController AposentadoriaConcedidaController = new AposentadoriaConcedidaController(
                     bDCommands, geraAposentadoriaConcedida);
             ResultSet rsAposentadoriaConcedida = AposentadoriaConcedidaController
-                    .getAposentadoriaConcedidaBatch("00000000", "99999999");
+                    .getAposentadoriaConcedidaBatch(beneficiariosStr);
             AposentadoriaConcedidaController.toXmlFile(rsAposentadoriaConcedida);
             /* Leiaute PensaoConcedida */
             PensaoConcedidaController PensaoConcedidaController = new PensaoConcedidaController(bDCommands,
                     geraPensaoConcedida);
-            ResultSet rsPensaoConcedida = PensaoConcedidaController.getPensaoConcedidaBatch("00000000", "99999999");
+            ResultSet rsPensaoConcedida = PensaoConcedidaController.getPensaoConcedidaBatch(beneficiariosStr);
             PensaoConcedidaController.toXmlFile(rsPensaoConcedida);
             /* Leiaute ItemFolhaRPPS */
             ItemFolhaRPPSController ItemFolhaRPPSController = new ItemFolhaRPPSController(bDCommands,
                     geraItemFolhaRPPS);
-            ResultSet rsItemFolhaRPPS = ItemFolhaRPPSController.getItemFolhaRPPSBatch("00000000", "99999999");
+            ResultSet rsItemFolhaRPPS = ItemFolhaRPPSController.getItemFolhaRPPSBatch(beneficiariosStr);
             ItemFolhaRPPSController.toXmlFile(rsItemFolhaRPPS);
             /* Leiaute CompensacaoPrevidenciaria */
             CompensacaoPrevidenciariaController CompensacaoPrevidenciariaController = new CompensacaoPrevidenciariaController(
                     bDCommands, geraCompensacaoPrevidenciaria);
             ResultSet rsCompensacaoPrevidenciaria = CompensacaoPrevidenciariaController
-                    .getCompensacaoPrevidenciariaBatch("00000000", "99999999");
+                    .getCompensacaoPrevidenciariaBatch(beneficiariosStr);
             CompensacaoPrevidenciariaController.toXmlFile(rsCompensacaoPrevidenciaria);
             /* Leiaute Parcelamento */
             ParcelamentoController ParcelamentoController = new ParcelamentoController(bDCommands, geraParcelamento);
-            ResultSet rsParcelamento = ParcelamentoController.getParcelamentoBatch("00000000", "99999999");
+            ResultSet rsParcelamento = ParcelamentoController.getParcelamentoBatch(beneficiariosStr);
             ParcelamentoController.toXmlFile(rsParcelamento);
             /* Leiaute ParcelasParcelamento */
             ParcelasParcelamentoController ParcelasParcelamentoController = new ParcelasParcelamentoController(
                     bDCommands, geraParcelasParcelamento);
-            ResultSet rsParcelasParcelamento = ParcelasParcelamentoController.getParcelasParcelamentoBatch("00000000",
-                    "99999999");
+            ResultSet rsParcelasParcelamento = ParcelasParcelamentoController
+                    .getParcelasParcelamentoBatch(beneficiariosStr);
             ParcelasParcelamentoController.toXmlFile(rsParcelasParcelamento);
             /* Leiaute PoliticaInvestimento */
             PoliticaInvestimentoController PoliticaInvestimentoController = new PoliticaInvestimentoController(
                     bDCommands, geraPoliticaInvestimento);
-            ResultSet rsPoliticaInvestimento = PoliticaInvestimentoController.getPoliticaInvestimentoBatch("00000000",
-                    "99999999");
+            ResultSet rsPoliticaInvestimento = PoliticaInvestimentoController
+                    .getPoliticaInvestimentoBatch(beneficiariosStr);
             PoliticaInvestimentoController.toXmlFile(rsPoliticaInvestimento);
             /* Leiaute CarteiraInvestimento */
             CarteiraInvestimentoController CarteiraInvestimentoController = new CarteiraInvestimentoController(
                     bDCommands, geraCarteiraInvestimento);
-            ResultSet rsCarteiraInvestimento = CarteiraInvestimentoController.getCarteiraInvestimentoBatch("00000000",
-                    "99999999");
+            ResultSet rsCarteiraInvestimento = CarteiraInvestimentoController
+                    .getCarteiraInvestimentoBatch(beneficiariosStr);
             CarteiraInvestimentoController.toXmlFile(rsCarteiraInvestimento);
             /* Leiaute AcompanhamentoMetaAtuarial */
             AcompanhamentoMetaAtuarialController AcompanhamentoMetaAtuarialController = new AcompanhamentoMetaAtuarialController(
                     bDCommands, geraAcompanhamentoMetaAtuarial);
             ResultSet rsAcompanhamentoMetaAtuarial = AcompanhamentoMetaAtuarialController
-                    .getAcompanhamentoMetaAtuarialBatch("00000000", "99999999");
+                    .getAcompanhamentoMetaAtuarialBatch(beneficiariosStr);
             AcompanhamentoMetaAtuarialController.toXmlFile(rsAcompanhamentoMetaAtuarial);
             /* Leiaute GestorFinanceiro */
             GestorFinanceiroController GestorFinanceiroController = new GestorFinanceiroController(bDCommands,
                     geraGestorFinanceiro);
-            ResultSet rsGestorFinanceiro = GestorFinanceiroController.getGestorFinanceiroBatch("00000000", "99999999");
+            ResultSet rsGestorFinanceiro = GestorFinanceiroController.getGestorFinanceiroBatch(beneficiariosStr);
             GestorFinanceiroController.toXmlFile(rsGestorFinanceiro);
             /* Leiaute PlanoCusteio */
             PlanoCusteioController PlanoCusteioController = new PlanoCusteioController(bDCommands, geraPlanoCusteio);
-            ResultSet rsPlanoCusteio = PlanoCusteioController.getPlanoCusteioBatch("00000000", "99999999");
+            ResultSet rsPlanoCusteio = PlanoCusteioController.getPlanoCusteioBatch(beneficiariosStr);
             PlanoCusteioController.toXmlFile(rsPlanoCusteio);
             /* Leiaute ResultadoAtuarial */
             ResultadoAtuarialController ResultadoAtuarialController = new ResultadoAtuarialController(bDCommands,
                     geraResultadoAtuarial);
-            ResultSet rsResultadoAtuarial = ResultadoAtuarialController.getResultadoAtuarialBatch("00000000",
-                    "99999999");
+            ResultSet rsResultadoAtuarial = ResultadoAtuarialController.getResultadoAtuarialBatch(beneficiariosStr);
             ResultadoAtuarialController.toXmlFile(rsResultadoAtuarial);
 
         } catch (Exception ex) {
@@ -919,7 +917,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
             jBtnFolder.setVisible(true);
             boolean errorsWarning = false;
             if (getErrorsCount() > 0 && getWarningsCount() > 0) {
-                MGSiapRPPS.toLogs(false, 
+                MGSiapRPPS.toLogs(false,
                         "Os Arquivos XML foram gerados com " + getErrorsCount() + " erros e "
                                 + getWarningsCount() + " avisos que TEMPORARIAMENTE NÃO IMPEDEM A TRANSMISSÃO",
                         0);
@@ -975,7 +973,7 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
                     /* Fim de ordenar avisos */
                     if (getWarningsCount() > 0) {
                         if (!errorsWarning) {
-                            MGSiapRPPS.toLogs(false, 
+                            MGSiapRPPS.toLogs(false,
                                     "Os Arquivos XML foram gerados com " + getWarningsCount()
                                             + " avisos que TEMPORARIAMENTE NÃO IMPEDEM A TRANSMISSÃO",
                                     0);

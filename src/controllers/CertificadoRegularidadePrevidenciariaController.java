@@ -42,7 +42,7 @@ public class CertificadoRegularidadePrevidenciariaController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getCertificadoRegularidadePrevidenciariaBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getCertificadoRegularidadePrevidenciariaBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

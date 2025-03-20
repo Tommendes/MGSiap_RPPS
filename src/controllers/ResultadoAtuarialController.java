@@ -42,7 +42,7 @@ public class ResultadoAtuarialController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getResultadoAtuarialBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getResultadoAtuarialBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

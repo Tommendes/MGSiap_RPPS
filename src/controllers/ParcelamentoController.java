@@ -42,7 +42,7 @@ public class ParcelamentoController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getParcelamentoBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getParcelamentoBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

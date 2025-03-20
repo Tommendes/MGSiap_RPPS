@@ -43,25 +43,24 @@ public class DependenteRPPSController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getDependenteRPPSBatch(String idBeneficiarioI, String idBeneficiarioF) {
-        idBeneficiarioI = String.format("%1$8s", idBeneficiarioI).replace(" ", "0");
-        idBeneficiarioF = String.format("%1$8s", idBeneficiarioF).replace(" ", "0");
+    public ResultSet getDependenteRPPSBatch(String beneficiarios) {
         String select = "S.IDSERVIDOR, S.CPF, D.CPF_DEP, D.DEPENDENTE, D.D_NASCIMENTO, D.TIPO, M.ANO, M.MES, M.PARCELA";
         String sqlRaw = "select " + select + " from DEPENDENTES D "
                 + "join SERVIDORES S on D.IDSERVIDOR = S.IDSERVIDOR "
                 + "left join MENSAL M on M.IDSERVIDOR = S.IDSERVIDOR "
                 + "left join CENTROS C on C.IDCENTRO = M.IDCENTRO "
                 + "left join SIAPORGAO SO on SO.C_UA = C.CODIGO_UA and SO.CNPJ = replace(replace(replace(C.CNPJ_UA, '/', ''), '-', ''), '.', '') "
-                + "where s.idservidor between '" + idBeneficiarioI + "' AND '" + idBeneficiarioF + "' "
+                + "where s.idservidor in (" + beneficiarios + ") "
                 + "and ano = '" + MGSiapRPPS.getOpcoes().getAno() + "' and mes = '"
-                + MGSiapRPPS.getOpcoes().getMes() + "' "
+                + MGSiapRPPS.getOpcoes().getMes() + "' and m.parcela = '000' "
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                + "and S.IDVINCULO in ('4', '5') "
+                + "and datediff(year, d.D_NASCIMENTO, cast('now' as date)) - iif(extract(month from d.D_NASCIMENTO) >= extract(month from cast('now' as date)) "
+                + "and extract(day from d.D_NASCIMENTO) >= extract(day from cast('now' as date)), 1, 0) <= 21 "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, true);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
         return tabelaRecebe;
     }
 
@@ -135,7 +134,8 @@ public class DependenteRPPSController {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("CPF Dependente inválido: '"
                                 + v.isNumberOrEmpty(resultSet.getString("CPF_DEP"), 11, "R")
-                                        .trim() + "', ");
+                                        .trim()
+                                + "', ");
                     }
                     // NomeDependente
                     if (v.isValueOrError(resultSet.getString("dependente"))) {
@@ -220,7 +220,7 @@ public class DependenteRPPSController {
                         Element layout = document.createElement("DependenteRPPS");
                         layout.appendChild(CPF);
                         layout.appendChild(NomeDependente);
-                        layout.appendChild(CPF);
+                        layout.appendChild(CPFDependente);
                         layout.appendChild(DataNascimento);
                         layout.appendChild(GrauParentesco);
 

@@ -3,6 +3,7 @@ package controllers;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -33,10 +34,12 @@ public class BeneficiarioController {
     private final BDCommands bDCommands;
     private final boolean gerarXml;
     private final String fileName = "Beneficiario.xml";
+    private ArrayList<String> beneficiarios;
 
-    public BeneficiarioController(BDCommands bDCommands, boolean gerarXml) {
+    public BeneficiarioController(BDCommands bDCommands, boolean gerarXml, ArrayList<String> beneficiarios) {
         this.bDCommands = bDCommands;
         this.gerarXml = gerarXml;
+        this.beneficiarios = beneficiarios;
     }
 
     /**
@@ -54,14 +57,14 @@ public class BeneficiarioController {
                 + "left join siaporgao so on so.c_ua = c.codigo_ua and so.cnpj = replace(replace(replace(c.cnpj_ua, '/', ''), '-', ''), '.', '') "
                 + "where s.idservidor between '" + idBeneficiarioI + "' AND '" + idBeneficiarioF + "' "
                 + "and ano = '" + MGSiapRPPS.getOpcoes().getAno() + "' and mes = '"
-                + MGSiapRPPS.getOpcoes().getMes() + "' "
+                + MGSiapRPPS.getOpcoes().getMes() + "' and m.parcela = '000' "
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                + "and S.IDVINCULO in ('4', '5') "
+                + "and S.IDVINCULO in ('1', '4', '5') "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("servidores s", "", sqlComplementar, "", false);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("servidores s", "", sqlComplementar, "", true);
         return tabelaRecebe;
     }
 
@@ -271,11 +274,11 @@ public class BeneficiarioController {
                     if (!celular.isEmpty() && celular != null) {
                         celular = v.isValueOrEmpty(celular.replaceAll("[^0-9]", ""), 9, "L");
                     }
-                    if ((celularDdd + celular).length() >= 10)
+                    if ((celularDdd + celular).length() == 10)
                         TelefoneCelular.appendChild(
                                 document.createTextNode(celularDdd + celular));
                     else
-                        TelefoneCelular.appendChild(document.createTextNode(""));
+                        TelefoneCelular.appendChild(document.createTextNode("00000000000"));
 
                     if (!sbW.toString().equalsIgnoreCase(startLog)) {
                         MGSiapRPPS.toLogs(false, sbW.toString(), MGSiapRPPS.WARNING_TYPE);
@@ -304,6 +307,8 @@ public class BeneficiarioController {
 
                         root.appendChild(layout);
                     }
+                    // Para cada beneficiario adicione um elemento ao array de beneficiarios
+                    this.beneficiarios.add(resultSet.getString("IDSERVIDOR"));
                 }
                 if (error) {
                     Element layout = document.createElement("Informacao");

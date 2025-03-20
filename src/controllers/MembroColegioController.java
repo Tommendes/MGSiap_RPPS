@@ -42,7 +42,7 @@ public class MembroColegioController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getMembroColegioBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getMembroColegioBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

@@ -42,7 +42,7 @@ public class PensaoConcedidaController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getPensaoConcedidaBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getPensaoConcedidaBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

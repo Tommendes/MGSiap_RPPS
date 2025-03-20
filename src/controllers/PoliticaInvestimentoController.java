@@ -42,7 +42,7 @@ public class PoliticaInvestimentoController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getPoliticaInvestimentoBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getPoliticaInvestimentoBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

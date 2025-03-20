@@ -42,7 +42,7 @@ public class RPPSController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getRPPSBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getRPPSBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

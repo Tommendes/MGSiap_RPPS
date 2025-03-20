@@ -42,7 +42,7 @@ public class CarteiraInvestimentoController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getCarteiraInvestimentoBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getCarteiraInvestimentoBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

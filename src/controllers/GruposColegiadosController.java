@@ -42,7 +42,7 @@ public class GruposColegiadosController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getGruposColegiadosBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getGruposColegiadosBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

@@ -42,7 +42,7 @@ public class AcompanhamentoMetaAtuarialController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getAcompanhamentoMetaAtuarialBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getAcompanhamentoMetaAtuarialBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

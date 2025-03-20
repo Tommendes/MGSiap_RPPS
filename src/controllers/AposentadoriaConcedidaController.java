@@ -42,7 +42,7 @@ public class AposentadoriaConcedidaController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getAposentadoriaConcedidaBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getAposentadoriaConcedidaBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

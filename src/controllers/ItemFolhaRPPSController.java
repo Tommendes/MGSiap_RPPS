@@ -42,7 +42,7 @@ public class ItemFolhaRPPSController {
      * @param idBeneficiarioF
      * @return
      */
-    public ResultSet getItemFolhaRPPSBatch(String idBeneficiarioI, String idBeneficiarioF) {
+    public ResultSet getItemFolhaRPPSBatch(String beneficiarios) {
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("orgao s", "", "", "", false);
         return tabelaRecebe;
     }

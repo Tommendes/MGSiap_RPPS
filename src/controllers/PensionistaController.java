@@ -49,9 +49,7 @@ public class PensionistaController {
      * @param idServidorF
      * @return
      */
-    public ResultSet getPensionistaBatch(String idServidorI, String idServidorF) {
-        idServidorI = String.format("%1$8s", idServidorI).replace(" ", "0");
-        idServidorF = String.format("%1$8s", idServidorF).replace(" ", "0");
+    public ResultSet getPensionistaBatch(String beneficiarios) {
         String select = "sb.cpf, sb.idservidor, sp.numeroato, sp.dataato, sp.veiculopublicacao, s.idservidor MatPensionista, "
                 + "s.cpf CPFPensionista, s.servidor, s.d_nascimento, sp.grauparentesco, sp.tipobeneficio, "
                 + "sp.datainicio, sp.datafim, sp.percentual, sp.responsavel, sp.revisao, md.d_afastamento, m.ano, m.mes, m.parcela";
@@ -64,13 +62,12 @@ public class PensionistaController {
                 + "join mdefinitivo md on md.idservidor = sb.idservidor "
                 + "join centros c on c.idcentro = m.idcentro "
                 + "join siaporgao so on so.c_ua = c.codigo_ua and so.cnpj = replace(replace(replace(c.cnpj_ua, '/', ''), '-', ''), '.', '') "
-                + "where s.idservidor between '" + idServidorI + "' AND '"
-                + idServidorF + "' and m.ano = '" + MGSiapRPPS.getOpcoes().getAno()
-                + "' and m.mes = '" + MGSiapRPPS.getOpcoes().getMes() + "' "
+                + "where s.idservidor in (" + beneficiarios + ") and m.ano = '" + MGSiapRPPS.getOpcoes().getAno()
+                + "' and m.mes = '" + MGSiapRPPS.getOpcoes().getMes() + "' and m.parcela = '000' "
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                + "and S.IDVINCULO in ('4', '5') "
+                + "and S.IDVINCULO in ('1', '4', '5') "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "and md.retorna = 'Desligamento' and f.tipo = 'C'"
                 + "group by " + select.replace(" CPFPensionista", "").replace(" MatPensionista", "")
