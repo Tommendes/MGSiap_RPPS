@@ -41,6 +41,23 @@ public class PensionistaController {
         this.bDCommands = bDCommands;
         this.gerarXml = gerarXml;
     }
+    
+    /**
+     * Verifica se o ônus do desligamento é "3 - Falecimento"
+     */
+    private boolean verificaOnusFalecimento(String idServidor) {
+        try {
+            String sqlOnus = "select onus from mdefinitivo where idservidor = '" + idServidor + "'";
+            ResultSet rsOnus = bDCommands.getTabelaGenerico("", "", "", sqlOnus, false);
+            if (rsOnus != null && rsOnus.first()) {
+                String onus = rsOnus.getString("onus");
+                return "3 - Falecimento".equals(onus);
+            }
+        } catch (SQLException ex) {
+            MGSiapRPPS.toLogs(false, "Erro ao verificar ônus: " + ex.getMessage(), MGSiapRPPS.ERROR_TYPE);
+        }
+        return false;
+    }
 
     /**
      * Captura os dados do(s) auxilio doenca(s) como lote
@@ -67,7 +84,7 @@ public class PensionistaController {
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                + "and S.IDVINCULO in ('1', '4', '5') "
+                + "and trim(S.IDVINCULO) in ('', '1', '4', '5') "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "and md.retorna = 'Desligamento' and f.tipo = 'C'"
                 + "group by " + select.replace(" CPFPensionista", "").replace(" MatPensionista", "")
@@ -127,6 +144,15 @@ public class PensionistaController {
                     Element Percentual = document.createElement("Percentual");
                     Element Responsavel = document.createElement("Responsavel");
                     Element Revisao = document.createElement("Revisao");
+
+                    // Verificar ônus do desligamento do instituidor da pensão
+                    String idServidorInstituidor = resultSet.getString("idservidor");
+                    if (!verificaOnusFalecimento(idServidorInstituidor)) {
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
+                        sb.append("Tipo de Informação Ônus do desligamento deve ser do tipo '3 - Falecimento' para a matricula: '"
+                                + v.isValueOrEmpty(idServidorInstituidor) + "', ");
+                    }
+
                     /* CPF */
                     if (v.isValueOrError(resultSet.getString("CPF"))
                             && v.isNumberOrError(resultSet.getString("CPF").trim().replaceAll("[^0-9]", ""))
@@ -326,7 +352,7 @@ public class PensionistaController {
                     DOMSource domSource = new DOMSource(document);
                     StreamResult streamResult = new StreamResult(new File(xmlFilePath));
                     transformer.transform(domSource, streamResult);
-                    
+
                     MGSiapRPPS.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
 
                     ResultSet tabelaAuxiliares = bDCommands.getTabelaGenerico("", "", "",

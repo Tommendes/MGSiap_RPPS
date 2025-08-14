@@ -43,6 +43,18 @@ public class BeneficiarioController {
     }
 
     /**
+     * Método auxiliar para obter strings do ResultSet de forma segura
+     */
+    private String getStringOrEmpty(ResultSet rs, String columnName) {
+        try {
+            String value = rs.getString(columnName);
+            return value != null ? value : "";
+        } catch (SQLException ex) {
+            return "";
+        }
+    }
+
+    /**
      * Captura os dados do(s) Beneficiario(s) como lote
      *
      * @param idBeneficiarioI
@@ -61,7 +73,7 @@ public class BeneficiarioController {
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                + "and S.IDVINCULO in ('1', '4', '5') "
+                + "and (trim(S.IDVINCULO) in ('', '1', '4', '5') or (S.IDVINCULO is null)) "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("servidores s", "", sqlComplementar, "", true);
@@ -95,11 +107,27 @@ public class BeneficiarioController {
             Validations v = new Validations();
 
             boolean error = false;
-            if (resultSet.first()) {
-                resultSet.beforeFirst();
+            boolean hasData = false;
+
+            // Verifica se há dados, mas sempre gera o arquivo XML
+            if (resultSet != null) {
+                try {
+                    hasData = resultSet.first();
+                    if (hasData) {
+                        resultSet.beforeFirst();
+                    }
+                } catch (SQLException ex) {
+                    MGSiapRPPS.toLogs(false, "Erro ao verificar dados: " + ex.getMessage(), 0);
+                    hasData = false;
+                }
+            }
+
+            if (hasData) {
                 while (resultSet.next()) {
-                    String startLog = "Beneficiario " + resultSet.getString("SERVIDOR") + " ("
-                            + resultSet.getString("IDSERVIDOR") + "): ";
+                    String servidor = getStringOrEmpty(resultSet, "SERVIDOR");
+                    String idServidor = getStringOrEmpty(resultSet, "IDSERVIDOR");
+
+                    String startLog = "Beneficiario " + servidor + " (" + idServidor + "): ";
                     StringBuilder sb = new StringBuilder();
                     StringBuilder sbW = new StringBuilder();
                     sb.append(startLog);
@@ -214,13 +242,12 @@ public class BeneficiarioController {
                                 document.createTextNode(v.isMarriage(
                                         resultSet.getString("ESTADO_CIVIL"))));
                     } else {
-                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                        sb.append("EstadoCivil inválido: '"
-                                + v.isValueOrEmpty(resultSet
-                                        .getString("ESTADO_CIVIL"))
-                                + "', ");
-                        // EstadoCivil.appendChild(document
-                        // .createTextNode(""));
+                        // MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
+                        // sbW.append("EstadoCivil inválido: '"
+                        // + v.isValueOrEmpty(resultSet
+                        // .getString("ESTADO_CIVIL"))
+                        // + "'(Informado '6'), ");
+                        EstadoCivil.appendChild(document.createTextNode("6"));
                     }
                     // NomeMae
                     if (v.isValueOrError(resultSet.getString("MAE"))) {
@@ -228,11 +255,13 @@ public class BeneficiarioController {
                                 document.createTextNode(v.isValueOrEmpty(
                                         resultSet.getString("MAE"), 255, "R").trim()));
                     } else {
-                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                        sb.append("NomeMae inválido: '"
-                                + v.isValueOrEmpty(resultSet
-                                        .getString("MAE"))
-                                + "', ");
+                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
+                        NomeMae.appendChild(document.createTextNode("Não informado"));
+                        // MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
+                        // sb.append("NomeMae inválido: '"
+                        // + v.isValueOrEmpty(resultSet
+                        // .getString("MAE"))
+                        // + "', ");
                     }
                     NomePai.appendChild(
                             document.createTextNode(v.isValueOrEmpty(
@@ -316,6 +345,9 @@ public class BeneficiarioController {
                             document.createTextNode("Arquivo gerado com erros! Ver o log"));
                     root.appendChild(layout);
                 }
+            } else {
+                // Sem dados de beneficiário, mas arquivo deve ser gerado com estrutura básica
+                MGSiapRPPS.toLogs(false, "Nenhum beneficiário encontrado, gerando arquivo vazio", 0);
             }
 
             if (gerarXml)

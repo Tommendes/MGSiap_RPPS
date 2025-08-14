@@ -35,6 +35,18 @@ public class DependenteRPPSController {
         this.bDCommands = bDCommands;
         this.gerarXml = gerarXml;
     }
+    
+    /**
+     * Método auxiliar para obter strings do ResultSet de forma segura
+     */
+    private String getStringOrEmpty(ResultSet rs, String columnName) {
+        try {
+            String value = rs.getString(columnName);
+            return value != null ? value : "";
+        } catch (SQLException ex) {
+            return "";
+        }
+    }
 
     /**
      * Captura os dados do(s) DependenteRPPS(s) como lote
@@ -51,13 +63,15 @@ public class DependenteRPPSController {
                 + "left join CENTROS C on C.IDCENTRO = M.IDCENTRO "
                 + "left join SIAPORGAO SO on SO.C_UA = C.CODIGO_UA and SO.CNPJ = replace(replace(replace(C.CNPJ_UA, '/', ''), '-', ''), '.', '') "
                 + "where s.idservidor in (" + beneficiarios + ") "
-                + "and ano = '" + MGSiapRPPS.getOpcoes().getAno() + "' and mes = '"
+                + "and m.ano = '" + MGSiapRPPS.getOpcoes().getAno() + "' and m.mes = '"
                 + MGSiapRPPS.getOpcoes().getMes() + "' and m.parcela = '000' "
                 + "and ((m.situacao = 'ADMITIDO') or exists (select md.idservidor from mdefinitivo md where md.idservidor = s.idservidor and md.onus = '3 - Falecimento' "
                 + "and ((select count(*) from servidor_aposentadoria sa where sa.idservidor = s.idservidor) > 0 or "
                 + "(select count(*) from servidor_pensionista sp where sp.cpfcontribuidor = s.cpf) > 0))) "
-                + "and datediff(year, d.D_NASCIMENTO, cast('now' as date)) - iif(extract(month from d.D_NASCIMENTO) >= extract(month from cast('now' as date)) "
-                + "and extract(day from d.D_NASCIMENTO) >= extract(day from cast('now' as date)), 1, 0) <= 21 "
+                + "and (extract(year from current_date) - extract(year from d.D_NASCIMENTO) - "
+                + "case when extract(month from d.D_NASCIMENTO) > extract(month from current_date) "
+                + "or (extract(month from d.D_NASCIMENTO) = extract(month from current_date) and extract(day from d.D_NASCIMENTO) > extract(day from current_date)) "
+                + "then 1 else 0 end) <= 21 "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
         ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sqlRaw, false);
@@ -66,6 +80,13 @@ public class DependenteRPPSController {
 
     public void toXmlFile(ResultSet resultSet) {
         MGSiapRPPS.toLogs(false, "Executando o Leiaute " + fileName, 0);
+        
+        // Verificação de segurança
+        if (bDCommands == null) {
+            MGSiapRPPS.toLogs(false, "Erro: bDCommands é nulo", MGSiapRPPS.ERROR_TYPE);
+            return;
+        }
+        
         try {
 
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -91,11 +112,31 @@ public class DependenteRPPSController {
             Validations v = new Validations();
 
             boolean error = false;
-            if (resultSet.first()) {
-                resultSet.beforeFirst();
+            boolean hasData = false;
+            
+            // Verifica se há dados, mas sempre gera o arquivo XML
+            if (resultSet != null) {
+                try {
+                    hasData = resultSet.first();
+                    if (hasData) {
+                        resultSet.beforeFirst();
+                    }
+                } catch (SQLException ex) {
+                    MGSiapRPPS.toLogs(false, "Erro ao verificar dados: " + ex.getMessage(), 0);
+                    hasData = false;
+                }
+            }
+            
+            if (hasData) {
                 while (resultSet.next()) {
-                    String startLog = "DependenteRPPS " + resultSet.getString("dependente") + " ("
-                            + resultSet.getString("IDSERVIDOR") + "): ";
+                    String dependenteNome = getStringOrEmpty(resultSet, "dependente");
+                    String idServidor = getStringOrEmpty(resultSet, "IDSERVIDOR");
+                    
+                    // Proteção contra valores nulos
+                    if (dependenteNome.isEmpty()) dependenteNome = "N/A";
+                    if (idServidor.isEmpty()) idServidor = "N/A";
+                    
+                    String startLog = "DependenteRPPS " + dependenteNome + " (" + idServidor + "): ";
                     StringBuilder sb = new StringBuilder();
                     StringBuilder sbW = new StringBuilder();
                     sb.append(startLog);
@@ -107,59 +148,46 @@ public class DependenteRPPSController {
                     Element GrauParentesco = document.createElement("GrauParentesco");
 
                     // CPF
-                    if (v.isValueOrError(resultSet.getString("CPF"))
-                            && v.isNumberOrError(resultSet.getString("CPF").trim()
-                                    .replaceAll("[^0-9]", ""))
-                            && v.isCPFOrError(resultSet.getString("CPF").trim()
-                                    .replaceAll("[^0-9]", ""))) {
+                    String cpfValue = getStringOrEmpty(resultSet, "CPF");
+                    if (v.isValueOrError(cpfValue)
+                            && v.isNumberOrError(cpfValue.trim().replaceAll("[^0-9]", ""))
+                            && v.isCPFOrError(cpfValue.trim().replaceAll("[^0-9]", ""))) {
                         CPF.appendChild(
-                                document.createTextNode(resultSet.getString("CPF")
-                                        .trim().replaceAll("[^0-9]", "")));
+                                document.createTextNode(cpfValue.trim().replaceAll("[^0-9]", "")));
                     } else {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("CPF inválido: '"
-                                + v.isNumberOrEmpty(resultSet.getString("CPF"), 11, "R")
-                                        .trim());
+                                + v.isNumberOrEmpty(cpfValue, 11, "R").trim());
                     }
                     // CPFDependente
-                    if (v.isValueOrError(resultSet.getString("CPF_DEP"))
-                            && v.isNumberOrError(resultSet.getString("CPF_DEP").trim()
-                                    .replaceAll("[^0-9]", ""))
-                            && v.isCPFOrError(resultSet.getString("CPF_DEP").trim()
-                                    .replaceAll("[^0-9]", ""))) {
+                    String cpfDepValue = getStringOrEmpty(resultSet, "CPF_DEP");
+                    if (v.isValueOrError(cpfDepValue)
+                            && v.isNumberOrError(cpfDepValue.trim().replaceAll("[^0-9]", ""))
+                            && v.isCPFOrError(cpfDepValue.trim().replaceAll("[^0-9]", ""))) {
                         CPFDependente.appendChild(
-                                document.createTextNode(resultSet.getString("CPF_DEP")
-                                        .trim().replaceAll("[^0-9]", "")));
+                                document.createTextNode(cpfDepValue.trim().replaceAll("[^0-9]", "")));
                     } else {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
                         sb.append("CPF Dependente inválido: '"
-                                + v.isNumberOrEmpty(resultSet.getString("CPF_DEP"), 11, "R")
-                                        .trim()
-                                + "', ");
+                                + v.isNumberOrEmpty(cpfDepValue, 11, "R").trim() + "', ");
                     }
                     // NomeDependente
-                    if (v.isValueOrError(resultSet.getString("dependente"))) {
+                    String nomeDepValue = getStringOrEmpty(resultSet, "dependente");
+                    if (v.isValueOrError(nomeDepValue)) {
                         NomeDependente.appendChild(document
-                                .createTextNode(v
-                                        .isValueOrEmpty(resultSet.getString(
-                                                "dependente"), 255, "R")
-                                        .trim()));
+                                .createTextNode(v.isValueOrEmpty(nomeDepValue, 255, "R").trim()));
                     } else {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                        sb.append("NomeDependente inválido: '" + resultSet.getString("dependente") + "', ");
+                        sb.append("NomeDependente inválido: '" + nomeDepValue + "', ");
                     }
                     // DataNascimento
-                    if (v.isValueOrError(resultSet.getString("D_NASCIMENTO"))) {
+                    String dataNascValue = getStringOrEmpty(resultSet, "D_NASCIMENTO");
+                    if (v.isValueOrError(dataNascValue)) {
                         DataNascimento.appendChild(
-                                document.createTextNode(v
-                                        .isValueOrEmpty(resultSet.getString(
-                                                "D_NASCIMENTO"))
-                                        .trim()));
+                                document.createTextNode(v.isValueOrEmpty(dataNascValue).trim()));
                     } else {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                        sb.append("Data Nascimento inválida: '"
-                                + v.isValueOrEmpty(resultSet.getString("D_NASCIMENTO"))
-                                + "', ");
+                        sb.append("Data Nascimento inválida: '" + v.isValueOrEmpty(dataNascValue) + "', ");
                     }
 
                     /* Graus de parentesco */
@@ -178,9 +206,10 @@ public class DependenteRPPSController {
                     // 9. A pessoa absolutamente incapaz, da qual seja tutor ou curador.
                     // 10. Ex-cônjuge
                     // 11. Agregado/Outros
-                    if (v.isValueOrError(resultSet.getString("TIPO"))) {
+                    String tipoValue = getStringOrEmpty(resultSet, "TIPO");
+                    if (v.isValueOrError(tipoValue)) {
                         String grauParentesco = "11";
-                        switch (resultSet.getString("TIPO")) {
+                        switch (tipoValue) {
                             case "CONJUGE":
                                 grauParentesco = "1";
                                 break;
@@ -206,7 +235,7 @@ public class DependenteRPPSController {
                         GrauParentesco.appendChild(document.createTextNode(grauParentesco));
                     } else {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                        sb.append("TIPO de dependência inválida: '" + resultSet.getString("TIPO") + "', ");
+                        sb.append("TIPO de dependência inválida: '" + tipoValue + "', ");
                     }
 
                     if (!sbW.toString().equalsIgnoreCase(startLog)) {
@@ -233,6 +262,9 @@ public class DependenteRPPSController {
                             document.createTextNode("Arquivo gerado com erros! Ver o log"));
                     root.appendChild(layout);
                 }
+            } else {
+                // Sem dados de dependentes, mas arquivo deve ser gerado com estrutura básica
+                MGSiapRPPS.toLogs(false, "Nenhum dependente encontrado, gerando arquivo vazio", 0);
             }
 
             if (gerarXml)
@@ -251,13 +283,15 @@ public class DependenteRPPSController {
                             "select count(*) from auxiliares where dominio = 'siap' "
                                     + "and meta = 'dependentes'",
                             false);
-                    tabelaAuxiliares.first();
-                    if (tabelaAuxiliares.getInt("count") == 0) {
-                        this.bDCommands.executeSql(
-                                "insert into auxiliares (id,created_at,dominio,meta,valor) values ("
-                                        + "(select coalesce(max(id)+1,1) from auxiliares),"
-                                        + "(select timestamp 'NOW' from rdb$database),"
-                                        + "'siap','dependentes','exec')");
+                    if (tabelaAuxiliares != null) {
+                        tabelaAuxiliares.first();
+                        if (tabelaAuxiliares.getInt("count") == 0) {
+                            this.bDCommands.executeSql(
+                                    "insert into auxiliares (id,created_at,dominio,meta,valor) values ("
+                                            + "(select coalesce(max(id)+1,1) from auxiliares),"
+                                            + "(select timestamp 'NOW' from rdb$database),"
+                                            + "'siap','dependentes','exec')");
+                        }
                     }
                 } catch (TransformerException ex) {
                     Logger.getLogger(DependenteRPPSController.class.getName()).log(Level.SEVERE, null,

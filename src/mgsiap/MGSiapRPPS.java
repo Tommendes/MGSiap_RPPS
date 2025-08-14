@@ -11,16 +11,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -87,8 +81,6 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
     private static Integer warningsCount = 0;
 
     private static String nome;
-
-    public static String VERSION = "1.250320.1752";
 
     public static final String BD_ROOT = System.getProperty("user.dir");// "C:/Windows/MGFolha/";//"C:\\Windows\\MGFolha";//
     public static final String SIAP_ROOT = BD_ROOT + "/SIAP_RPPS/";// "C:/Windows/MGFolha/SIAP_RPPS/";//"C:\\Fontes\\Mega\\MGFolha\\SIAP_RPPS\\";////"C:\\Windows\\MGFolha\\SIAP_RPPS\\";//
@@ -671,12 +663,75 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
     }
 
     public static String getItemsFromList(List<String> dados, int countChars) {
+        if (dados == null || dados.isEmpty()) {
+            return "''"; // Retorna um valor que não vai dar match, mas é SQL válido
+        }
+        
         String ret = "";
         for (int i = 0; i < dados.size(); i++) {
-            ret += "\"" + dados.get(i).substring(0, countChars) + "\",";
+            String item = dados.get(i);
+            if (item != null && !item.trim().isEmpty()) {
+                try {
+                    // Remove caracteres não numéricos e preenche com zeros à esquerda
+                    String numeroLimpo = item.replaceAll("[^0-9]", "");
+                    if (!numeroLimpo.isEmpty()) {
+                        String itemFormatado = String.format("%0" + countChars + "d", Integer.parseInt(numeroLimpo));
+                        ret += "\"" + itemFormatado + "\",";
+                    }
+                } catch (NumberFormatException ex) {
+                    // Se não conseguir converter para número, usa o item original (se tiver tamanho suficiente)
+                    if (item.length() >= countChars) {
+                        ret += "\"" + item.substring(0, countChars) + "\",";
+                    }
+                    // Se for menor que countChars, simplesmente ignora o item
+                }
+            }
         }
-        ret = ret.substring(0, ret.length() - 1);
-        return ret;
+        
+        if (ret.length() > 0) {
+            ret = ret.substring(0, ret.length() - 1);
+            return ret;
+        } else {
+            return "''"; // Se nenhum item válido, retorna valor seguro
+        }
+    }
+    
+    /**
+     * Adiciona instituidores da pensão à lista de beneficiários para garantir cross-references corretas
+     */
+    private static void addInstituitesPensao(ArrayList<String> beneficiarios, BDCommands bDCommands) {
+        try {
+            if (beneficiarios.isEmpty()) {
+                return;
+            }
+            
+            String beneficiariosStr = getItemsFromList(beneficiarios, 8).replaceAll("\"", "\'");
+            
+            // Query para encontrar instituidores da pensão relacionados aos beneficiários atuais
+            String sqlInstituidores = "select distinct s.idservidor "
+                    + "from servidores s "
+                    + "join servidor_pensionista sp on sp.cpfcontribuidor = s.cpf "
+                    + "join servidores pensionista on pensionista.idservidor = sp.idservidor "
+                    + "where pensionista.idservidor in (" + beneficiariosStr + ") "
+                    + "and s.idservidor not in (" + beneficiariosStr + ")";
+                    
+            ResultSet rsInstituidores = bDCommands.getTabelaGenerico("", "", "", sqlInstituidores, false);
+            
+            if (rsInstituidores != null && rsInstituidores.first()) {
+                rsInstituidores.beforeFirst();
+                int countAdded = 0;
+                while (rsInstituidores.next()) {
+                    String idInstituidor = rsInstituidores.getString("idservidor");
+                    if (idInstituidor != null && !beneficiarios.contains(idInstituidor)) {
+                        beneficiarios.add(idInstituidor);
+                        countAdded++;
+                    }
+                }
+                toLogs(false, "Adicionados " + countAdded + " instituidores da pensão", 0);
+            }
+        } catch (SQLException ex) {
+            toLogs(false, "Erro ao adicionar instituidores da pensão: " + ex.getMessage(), ERROR_TYPE);
+        }
     }
 
     public static String getItemsFromList(List<String> dados, int countChars, boolean output) {
@@ -804,6 +859,10 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
                     beneficiarios);
             ResultSet rsBeneficiario = BeneficiarioController.getBeneficiarioBatch("00000000", "99999999");
             BeneficiarioController.toXmlFile(rsBeneficiario);
+            
+            // Adiciona instituidores da pensão à lista de beneficiários
+            addInstituitesPensao(beneficiarios, bDCommands);
+            
             String beneficiariosStr = getItemsFromList(beneficiarios, 8).replaceAll("\"", "\'");
             /* Leiaute RPPS */
             RPPSController RPPSController = new RPPSController(bDCommands, geraRPPS);
