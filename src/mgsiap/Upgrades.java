@@ -3,6 +3,7 @@ package mgsiap;
 public class Upgrades {
 
     public static String VERSION = "1.250814.1818";
+    
 
     public Upgrades() {
     }
@@ -24,5 +25,12 @@ public class Upgrades {
         sb.append("      1. Novo leiaute RPPS" + "\n");
         
         return sb.toString();
+    }
+
+    /**
+     * @return the vERSION
+     */
+    public static String getVERSION() {
+        return VERSION;
     }
 }

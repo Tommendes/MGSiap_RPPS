@@ -651,7 +651,8 @@ public final class MGSiapRPPS extends javax.swing.JFrame {
         }
         // Fim de caso seja acionado via shell
 
-        MGSiapRPPS.getOpcoes().setVersion(VERSION);
+        Upgrades.getVERSION();
+        MGSiapRPPS.getOpcoes().setVersion(Upgrades.getVERSION());
         jlVersion.setText("V.: " + MGSiapRPPS.getOpcoes().getVersion());
 
         MGSiapRPPS.getOpcoes().setOrder("S.SERVIDOR");
