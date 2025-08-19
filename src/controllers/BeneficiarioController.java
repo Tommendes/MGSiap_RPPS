@@ -76,7 +76,7 @@ public class BeneficiarioController {
                 + "and (trim(S.IDVINCULO) in ('', '1', '4', '5') or (S.IDVINCULO is null)) "
                 + "and so.cardug = '" + MGSiapRPPS.getOpcoes().getCodigoOrgao().substring(0, 6) + "' "
                 + "order by s.servidor";
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("servidores s", "", sqlComplementar, "", true);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("servidores s", "", sqlComplementar, "", false);
         return tabelaRecebe;
     }
 
