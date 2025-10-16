@@ -48,25 +48,26 @@ public class ItemFolhaRPPSController {
      */
     public ResultSet getItemFolhaRPPSBatch(String beneficiarios) {
         String sql = "select S.CPF, S.IDSERVIDOR as MATRICULA, F.MES as MESCOMPETENCIA, F.ANO as ANO, " +
-                     "O.IDORGAO as CNPJFONTEPAGADORA, E.SIAPNATUREZA as NATUREZA, E.SIAPTIPO as TIPO, " +
-                     "E.EVENTO as DESCRICAO, E.SIAPRPPS as INCIDECONTRIBUICAORPPS, E.SIAPIRRF as INCIDEIRRF, " +
-                     "E.SIAPTETO as TETOREMUNERATORIO, E.SIAPRGPS as INCIDECONTRIBUICAORGPS, " +
-                     "E.SIAPFGTS as INCIDEFGTS, sum(F.N_VALOR) as VALOR " +
-                     "from SERVIDORES S " +
-                     "join FINANCEIRO F on F.IDSERVIDOR = S.IDSERVIDOR " +
-                     "join EVENTOS E on E.IDEVENTO = F.IDEVENTO " +
-                     "join ORGAO O on O.IDORGAO is not null " +
-                     "where F.ANO = '" + MGSiapRPPS.getOpcoes().getAno() + "' and " +
-                     "F.MES = '" + MGSiapRPPS.getOpcoes().getMes() + "' and " +
-                     "F.N_VALOR > 0 " +
-                     (beneficiarios != null && !beneficiarios.isEmpty() ? 
-                         "and S.IDSERVIDOR in (" + beneficiarios + ") " : "") +
-                     "group by S.CPF, S.IDSERVIDOR, F.ANO, F.MES, O.IDORGAO, E.SIAPNATUREZA, " +
-                     "E.SIAPTIPO, E.EVENTO, E.SIAPRPPS, E.SIAPIRRF, E.SIAPTETO, E.SIAPRGPS, E.SIAPFGTS " +
-                     "order by S.IDSERVIDOR";
-        
+                "O.IDORGAO as CNPJFONTEPAGADORA, E.SIAPNATUREZA as NATUREZA, E.SIAPTIPO as TIPO, " +
+                "E.EVENTO as DESCRICAO, E.SIAPRPPS as INCIDECONTRIBUICAORPPS, E.SIAPIRRF as INCIDEIRRF, " +
+                "E.SIAPTETO as TETOREMUNERATORIO, E.SIAPRGPS as INCIDECONTRIBUICAORGPS, " +
+                "E.SIAPFGTS as INCIDEFGTS, sum(F.N_VALOR) as VALOR " +
+                "from SERVIDORES S " +
+                "join FINANCEIRO F on F.IDSERVIDOR = S.IDSERVIDOR " +
+                "join EVENTOS E on E.IDEVENTO = F.IDEVENTO " +
+                "join ORGAO O on O.IDORGAO is not null " +
+                "where F.ANO = '" + MGSiapRPPS.getOpcoes().getAno() + "' and " +
+                "F.MES = '" + MGSiapRPPS.getOpcoes().getMes() + "' and " +
+                "F.N_VALOR > 0 " +
+                (beneficiarios != null && !beneficiarios.isEmpty() ? "and S.IDSERVIDOR in (" + beneficiarios + ") "
+                        : "")
+                +
+                "group by S.CPF, S.IDSERVIDOR, F.ANO, F.MES, O.IDORGAO, E.SIAPNATUREZA, " +
+                "E.SIAPTIPO, E.EVENTO, E.SIAPRPPS, E.SIAPIRRF, E.SIAPTETO, E.SIAPRGPS, E.SIAPFGTS " +
+                "order by S.IDSERVIDOR";
+
         MGSiapRPPS.toLogs(false, "Executando query ItemFolhaRPPS: " + sql, 0);
-        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sql, true);
+        ResultSet tabelaRecebe = bDCommands.getTabelaGenerico("", "", "", sql, false);
         return tabelaRecebe;
     }
 
@@ -75,7 +76,7 @@ public class ItemFolhaRPPSController {
         StringBuilder sb = new StringBuilder();
         Functions f = new Functions();
         Validations v = new Validations();
-        
+
         try {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
@@ -98,31 +99,49 @@ public class ItemFolhaRPPSController {
             root.appendChild(mes);
 
             int itemCount = 0;
-            
+
             // Processar registros do ResultSet
             if (resultSet != null) {
                 while (resultSet.next()) {
                     itemCount++;
-                    
+
                     Element itemFolhaRPPS = document.createElement("ItemFolhaRPPS");
-                    
+
                     // CPF (obrigatório, 11 dígitos numéricos)
                     Element cpf = document.createElement("CPF");
-                    String cpfValue = v.isNumberOrEmpty(resultSet.getString("cpf"), 11, "L");
-                    if (cpfValue.length() != 11) {
+                    // String cpfValue = v.isNumberOrEmpty(resultSet.getString("cpf"), 11, "L");
+                    // System.out.println("CPF original: '" + resultSet.getString("cpf") + "',
+                    // formatado: '" + cpfValue + "'");
+                    // if (cpfValue.length() != 11) {
+                    // MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
+                    // sb.append("CPF deve ter 11 dígitos: '" + cpfValue + "', ");
+                    // } else if (!v.isCPFOrError(cpfValue)) {
+                    // MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
+                    // sb.append("CPF inválido: '" + cpfValue + "', ");
+                    // }
+                    // cpf.appendChild(document.createTextNode(cpfValue));
+                    if (v.isValueOrError(resultSet.getString("CPF"))
+                            && v.isNumberOrError(resultSet.getString("CPF").trim()
+                                    .replaceAll("[^0-9]", ""))
+                            && v.isCPFOrError(resultSet.getString("CPF").trim()
+                                    .replaceAll("[^0-9]", ""))) {
+                        String cpfValue = resultSet.getString("CPF")
+                                .trim().replaceAll("[^0-9]", "");
+                                System.out.println("CPF original: '" + resultSet.getString("CPF") + "', formatado: '" + cpfValue + "'");
+                        cpf.appendChild(
+                                document.createTextNode(cpfValue));
+                    } else {
                         MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                        sb.append("CPF deve ter 11 dígitos: '" + cpfValue + "', ");
-                    } else if (!v.isCPFOrError(cpfValue)) {
-                        MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
-                        sb.append("CPF inválido: '" + cpfValue + "', ");
+                        sb.append("CPF inválido: '"
+                                + v.isNumberOrEmpty(resultSet.getString("CPF"), 11, "R")
+                                        .trim());
                     }
-                    cpf.appendChild(document.createTextNode(cpfValue));
-                    
+
                     // Matrícula (obrigatório, máximo 16 caracteres)
                     Element matricula = document.createElement("Matricula");
                     String matriculaValue = v.isValueOrEmpty(resultSet.getString("matricula"), 16, "L");
                     matricula.appendChild(document.createTextNode(matriculaValue));
-                    
+
                     // Mês Competência (obrigatório, 2 dígitos)
                     Element mesCompetencia = document.createElement("MesCompetencia");
                     String mesCompValue = v.isNumberOrEmpty(resultSet.getString("mescompetencia"), 2, "L");
@@ -141,12 +160,12 @@ public class ItemFolhaRPPSController {
                         sb.append("Mês competência inválido: '" + mesCompValue + "', ");
                     }
                     mesCompetencia.appendChild(document.createTextNode(mesCompValue));
-                    
+
                     // Ano (obrigatório, 4 dígitos)
                     Element ano = document.createElement("Ano");
                     String anoValue = v.isNumberOrEmpty(resultSet.getString("ano"), 4, "L");
                     ano.appendChild(document.createTextNode(anoValue));
-                    
+
                     // CNPJ Fonte Pagadora (obrigatório, máximo 14 caracteres)
                     Element cnpjFontePagadora = document.createElement("CNPJFontePagadora");
                     String cnpjValue = v.isNumberOrEmpty(resultSet.getString("cnpjfontepagadora"), 14, "L");
@@ -163,7 +182,7 @@ public class ItemFolhaRPPSController {
                         sb.append("CNPJ inválido: '" + cnpjValue + "', ");
                     }
                     cnpjFontePagadora.appendChild(document.createTextNode(cnpjValue));
-                    
+
                     // Natureza (obrigatório, código de 4 dígitos)
                     Element natureza = document.createElement("Natureza");
                     String naturezaValue = v.isNumberOrEmpty(resultSet.getString("natureza"), 4, "L");
@@ -173,7 +192,7 @@ public class ItemFolhaRPPSController {
                         sb.append("Natureza não informada, usando padrão '1000', ");
                     }
                     natureza.appendChild(document.createTextNode(naturezaValue));
-                    
+
                     // Tipo (obrigatório, limitado ao código)
                     Element tipo = document.createElement("Tipo");
                     String tipoValue = v.isNumberOrEmpty(resultSet.getString("tipo"), 1, "L");
@@ -183,13 +202,13 @@ public class ItemFolhaRPPSController {
                         sb.append("Tipo não informado, usando padrão '1', ");
                     }
                     tipo.appendChild(document.createTextNode(tipoValue));
-                    
+
                     // Descrição (obrigatório)
                     Element descricao = document.createElement("Descricao");
                     String descricaoValue = v.isValueOrEmpty(resultSet.getString("descricao"));
                     descricaoValue = f.removeAcentos(descricaoValue); // Remove acentos
                     descricao.appendChild(document.createTextNode(descricaoValue));
-                    
+
                     // Incide Contribuição RPPS (obrigatório, limitado ao código)
                     Element incideContribuicaoRPPS = document.createElement("IncideContribuicaoRPPS");
                     String incideRPPSValue = v.isNumberOrEmpty(resultSet.getString("incidecontribuicaorpps"), 1, "L");
@@ -199,7 +218,7 @@ public class ItemFolhaRPPSController {
                         sb.append("IncideContribuicaoRPPS não informado, usando padrão '1', ");
                     }
                     incideContribuicaoRPPS.appendChild(document.createTextNode(incideRPPSValue));
-                    
+
                     // Incide IRRF (obrigatório, limitado ao código de 4 dígitos)
                     Element incideIRRF = document.createElement("IncideIRRF");
                     String incideIRRFValue = v.isNumberOrEmpty(resultSet.getString("incideirrf"), 4, "L");
@@ -209,7 +228,7 @@ public class ItemFolhaRPPSController {
                         sb.append("IncideIRRF não informado, usando padrão '0000', ");
                     }
                     incideIRRF.appendChild(document.createTextNode(incideIRRFValue));
-                    
+
                     // Teto Remuneratório (obrigatório, limitado ao código)
                     Element tetoRemuneratorio = document.createElement("TetoRemuneratorio");
                     String tetoValue = v.isNumberOrEmpty(resultSet.getString("tetoremuneratorio"), 1, "L");
@@ -219,7 +238,7 @@ public class ItemFolhaRPPSController {
                         sb.append("TetoRemuneratorio não informado, usando padrão '1', ");
                     }
                     tetoRemuneratorio.appendChild(document.createTextNode(tetoValue));
-                    
+
                     // Incide Contribuição RGPS (obrigatório, limitado ao código de 2 dígitos)
                     Element incideContribuicaoRGPS = document.createElement("IncideContribuicaoRGPS");
                     String incideRGPSValue = v.isNumberOrEmpty(resultSet.getString("incidecontribuicaorgps"), 2, "L");
@@ -229,7 +248,7 @@ public class ItemFolhaRPPSController {
                         sb.append("IncideContribuicaoRGPS não informado, usando padrão '00', ");
                     }
                     incideContribuicaoRGPS.appendChild(document.createTextNode(incideRGPSValue));
-                    
+
                     // Incide FGTS (obrigatório, limitado ao código de 2 dígitos)
                     Element incideFGTS = document.createElement("IncideFGTS");
                     String incideFGTSValue = v.isNumberOrEmpty(resultSet.getString("incidefgts"), 2, "L");
@@ -239,7 +258,7 @@ public class ItemFolhaRPPSController {
                         sb.append("IncideFGTS não informado, usando padrão '00', ");
                     }
                     incideFGTS.appendChild(document.createTextNode(incideFGTSValue));
-                    
+
                     // Valor (obrigatório, decimal formato americano)
                     Element valor = document.createElement("Valor");
                     String valorValue = v.isDecimalOrEmpty(resultSet.getString("valor"));
@@ -253,7 +272,7 @@ public class ItemFolhaRPPSController {
                             // Primeiro, normalizar entrada (trocar vírgula por ponto se necessário)
                             valorValue = valorValue.replace(",", ".");
                             double valorNum = Double.parseDouble(valorValue);
-                            
+
                             // Usar DecimalFormat com locale americano para garantir formato com ponto
                             DecimalFormat df = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.US));
                             valorValue = df.format(valorNum);
@@ -264,7 +283,7 @@ public class ItemFolhaRPPSController {
                         }
                     }
                     valor.appendChild(document.createTextNode(valorValue));
-                    
+
                     // Adicionar todos os elementos ao ItemFolhaRPPS
                     itemFolhaRPPS.appendChild(cpf);
                     itemFolhaRPPS.appendChild(matricula);
@@ -280,13 +299,13 @@ public class ItemFolhaRPPSController {
                     itemFolhaRPPS.appendChild(incideContribuicaoRGPS);
                     itemFolhaRPPS.appendChild(incideFGTS);
                     itemFolhaRPPS.appendChild(valor);
-                    
+
                     root.appendChild(itemFolhaRPPS);
                 }
             }
-            
+
             MGSiapRPPS.toLogs(false, "Total de itens de folha processados: " + itemCount, 0);
-            
+
             // Log de erros se houver
             if (sb.length() > 0) {
                 MGSiapRPPS.toLogs(true, "Erros/Avisos no ItemFolhaRPPS: " + sb.toString(), 0);
@@ -298,9 +317,9 @@ public class ItemFolhaRPPSController {
                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                     Transformer transformer = transformerFactory.newTransformer();
                     DOMSource domSource = new DOMSource(document);
-                    StreamResult streamResult = new StreamResult(new File(xmlFilePath));                 
+                    StreamResult streamResult = new StreamResult(new File(xmlFilePath));
                     transformer.transform(domSource, streamResult);
-                    
+
                     MGSiapRPPS.toLogs(false, "Arquivo XML " + fileName + " salvo em: " + xmlFilePath, 0);
 
                     ResultSet tabelaAuxiliares = bDCommands.getTabelaGenerico("", "", "",

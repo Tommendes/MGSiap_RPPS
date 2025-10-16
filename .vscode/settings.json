@@ -1,7 +1,20 @@
 {
-    "java.project.sourcePaths": ["src"],
+    "java.project.sourcePaths": [
+        "src"
+    ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar"
-    ]
+        "d:\\Fontes\\JavaProjects\\MGSiapRPPS\\lib\\commons-io-2.8.0.jar",
+        "d:\\Fontes\\JavaProjects\\MGSiapRPPS\\lib\\commons-lang3-3.7.jar",
+        "d:\\Fontes\\JavaProjects\\MGSiapRPPS\\lib\\jaybird-full-3.0.2.jar"
+    ],
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-1.8",
+            "path": "C:\\Program Files\\Eclipse Adoptium\\jdk-8.0.462.8-hotspot",
+            "default": true
+        }
+    ],
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.import.generatesMetadataFilesAtProjectRoot": false
 }

@@ -288,7 +288,7 @@ public class VinculoRPPSController {
                             bDCommands.executeSql(
                                     "update servidores set d_admissao = '" + dataAfastamento + "' where idservidor = '"
                                             + idServidor + "'",
-                                    true);
+                                    false);
                         }
                     }
                 }

@@ -2,7 +2,7 @@ package mgsiap;
 
 public class Upgrades {
 
-    public static String VERSION = "1.250819.1120";
+    public static String VERSION = "1.251016.1028";
 
     public Upgrades() {
     }
@@ -11,7 +11,9 @@ public class Upgrades {
         StringBuilder sb = new StringBuilder();
         // sb.append(" " + "\n");
         // sb.append(" " + "\n");
-        sb.append("19 de agosto de 2025: v. " + VERSION + "\n");
+        sb.append("16 de outubro de 2025: v. " + VERSION + "\n");
+        sb.append("      1. Melhoria na geração do arquivo ItemFolhaRPPS.xml" + "\n");
+        sb.append("19 de agosto de 2025: v. 1.250819.1120\n");
         sb.append("      1. Melhoria na geração do arquivo ItemFolhaRPPS.xml" + "\n");
         sb.append("14 de agosto de 2025: v. 1.250814.1818\n");
         sb.append("      1. Operações e correções gerais no sistema" + "\n");
