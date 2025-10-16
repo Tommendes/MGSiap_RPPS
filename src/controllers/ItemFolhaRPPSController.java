@@ -109,17 +109,6 @@ public class ItemFolhaRPPSController {
 
                     // CPF (obrigatório, 11 dígitos numéricos)
                     Element cpf = document.createElement("CPF");
-                    // String cpfValue = v.isNumberOrEmpty(resultSet.getString("cpf"), 11, "L");
-                    // System.out.println("CPF original: '" + resultSet.getString("cpf") + "',
-                    // formatado: '" + cpfValue + "'");
-                    // if (cpfValue.length() != 11) {
-                    // MGSiapRPPS.setErrorsCount(MGSiapRPPS.ERROR_TYPE);
-                    // sb.append("CPF deve ter 11 dígitos: '" + cpfValue + "', ");
-                    // } else if (!v.isCPFOrError(cpfValue)) {
-                    // MGSiapRPPS.setErrorsCount(MGSiapRPPS.WARNING_TYPE);
-                    // sb.append("CPF inválido: '" + cpfValue + "', ");
-                    // }
-                    // cpf.appendChild(document.createTextNode(cpfValue));
                     if (v.isValueOrError(resultSet.getString("CPF"))
                             && v.isNumberOrError(resultSet.getString("CPF").trim()
                                     .replaceAll("[^0-9]", ""))
@@ -127,7 +116,6 @@ public class ItemFolhaRPPSController {
                                     .replaceAll("[^0-9]", ""))) {
                         String cpfValue = resultSet.getString("CPF")
                                 .trim().replaceAll("[^0-9]", "");
-                                System.out.println("CPF original: '" + resultSet.getString("CPF") + "', formatado: '" + cpfValue + "'");
                         cpf.appendChild(
                                 document.createTextNode(cpfValue));
                     } else {
